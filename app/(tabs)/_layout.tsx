@@ -1,9 +1,11 @@
-import { Tabs } from 'expo-router';
+import { Link, Tabs } from 'expo-router';
 import React from 'react';
 
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Pressable } from 'react-native';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -12,24 +14,37 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
+        headerShown: true,
+        
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
-          ),
+          title: 'Refrigerator',
+          tabBarIcon: () => <MaterialCommunityIcons name="fridge-bottom" size={24} color="black" />,
+         
+          
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="freezer"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
-          ),
+          title: 'Freezer',
+          tabBarIcon: () => <MaterialCommunityIcons name="fridge-top" size={24} color="black" />,
+        }}
+      />
+      <Tabs.Screen
+        name="pantry"
+        options={{
+          title: 'Panty',
+          tabBarIcon: () => <MaterialCommunityIcons name="bread-slice-outline" size={24} color="black" />,
+        }}
+      />
+      <Tabs.Screen
+        name="counter"
+        options={{
+          title: 'Counter',
+          tabBarIcon: () => <MaterialCommunityIcons name="store-marker" size={24} color="black" />,
         }}
       />
     </Tabs>
