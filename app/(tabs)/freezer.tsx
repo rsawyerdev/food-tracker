@@ -22,12 +22,7 @@ export default function FreezerScreen() {
     getData();
     let lastID =
       freezerList && freezerList.length > 0 ? freezerList.at(-1).id : 1;
-    console.log(
-      '1',
-      lastID,
-      freezerList && freezerList.length > 0,
-      freezerList.at(-1)
-    );
+
     const newListItem = { name: freeText, date: new Date(), id: lastID + 1 };
     if (getNewList) {
       freezerList.push(newListItem);
@@ -47,6 +42,7 @@ export default function FreezerScreen() {
   };
 
   const getData = async () => {
+    if (freezerList.length > 0) return null;
     try {
       const jsonValue = await AsyncStorage.getItem('freezer-key');
       setFreezerList(JSON.parse(jsonValue));
