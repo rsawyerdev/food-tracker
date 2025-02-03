@@ -23,14 +23,18 @@ export default function FreezerScreen() {
     let lastID =
       freezerList && freezerList.length > 0 ? freezerList.at(-1).id : 1;
 
-    const newListItem = { name: freeText, date: new Date(), id: lastID + 1 };
+    const newListItem = {
+      name: freeText,
+      date: new Date().toString(),
+      id: lastID + 1,
+    };
     if (getNewList) {
       freezerList.push(newListItem);
       setGetNewList(false);
       setFreeText('');
       storeData();
     }
-  });
+  }, [freezerList, getNewList]);
 
   const storeData = async () => {
     try {
