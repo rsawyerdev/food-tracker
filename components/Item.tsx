@@ -4,7 +4,6 @@ import { useState } from 'react';
 
 
 export default function ItemCard(props: any) {
-
     const [date, setDate] = useState(new Date(Date.now()));
     const [mode, setMode] = useState('date');
     const [show, setShow] = useState(false);
@@ -55,6 +54,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 4
   },
   title: {
     fontSize: 20,
