@@ -1,8 +1,8 @@
-# Welcome to your Food Tracker
+# Welcome to Food Tracker
 
 ## Food tracker is an open source application that will help users track the food they have purchased.
 
-### More details to come.
+More details to come.
 
 ## Get started
 
