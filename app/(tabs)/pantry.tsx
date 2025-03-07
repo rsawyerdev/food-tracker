@@ -1,6 +1,8 @@
 import {
   Button,
   FlatList,
+  Keyboard,
+  Pressable,
   StyleSheet,
   Text,
   TextInput,
@@ -10,32 +12,34 @@ import {
 import ItemCard from '../../components/Item';
 import { useState, useEffect } from 'react';
 import { Item } from '@/types/types';
+import { firstItem } from '@/constants/Utils';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
+import { clearStorage } from '@/api/device/storage';
 
 export default function PantryScreen() {
-  const [pantryList, setPantryList] = useState<Item[]>([]);
+  const [pantryList, setPantryList] = useState<Item[]>([firstItem]);
   const [freeText, setFreeText] = useState<string>('');
-  const [getNewList, setGetNewList] = useState<boolean>(false);
 
   useEffect(() => {
-    getData();
-    let lastID = pantryList && pantryList.length > 0 ? pantryList.at(-1).id : 1;
+    if (pantryList.length === 1) {
+      storeData();
+      return;
+    }
+  }, [pantryList]);
 
+  const storeData = async () => {
+    let lastID = pantryList && pantryList.length > 0 ? pantryList.at(-1).id : 1;
+    if (!freeText) return;
     const newListItem = {
       name: freeText,
       date: new Date().toString(),
       id: lastID + 1,
     };
-    if (getNewList) {
-      pantryList.push(newListItem);
-      setGetNewList(false);
-      setFreeText('');
-      storeData();
-    }
-  }, [pantryList, getNewList]);
+    pantryList.push(newListItem);
+    setFreeText('');
 
-  const storeData = async () => {
     try {
       const jsonValue = JSON.stringify(pantryList);
       await AsyncStorage.setItem('pantry-key', jsonValue);
@@ -45,7 +49,6 @@ export default function PantryScreen() {
   };
 
   const getData = async () => {
-    if (pantryList.length > 0 || pantryList.length !== null) return null;
     try {
       const jsonValue = await AsyncStorage.getItem('pantry-key');
       setPantryList(JSON.parse(jsonValue));
@@ -60,32 +63,45 @@ export default function PantryScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={{ flexDirection: 'row' }}>
-        <TextInput
-          style={{
-            height: 50,
-            width: 100,
-            backgroundColor: 'pink',
-            marginBottom: 12,
-            paddingLeft: 8,
-          }}
-          placeholder='Enter'
-          value={freeText}
-          onChangeText={setFreeText}
+    <Pressable style={styles.container} onPress={Keyboard.dismiss}>
+      <View>
+        <View style={{ flexDirection: 'row' }}>
+          <TextInput
+            style={{
+              height: 50,
+              width: 100,
+              backgroundColor: 'pink',
+              marginBottom: 12,
+              paddingLeft: 8,
+            }}
+            placeholder='e.g rice'
+            value={freeText}
+            onChangeText={setFreeText}
+            enablesReturnKeyAutomatically
+            onSubmitEditing={() => storeData()}
+          />
+          <Button
+            title='enter'
+            onPress={() => storeData()}
+            disabled={!freeText}
+          />
+        </View>
+        <FlatList
+          data={pantryList}
+          keyExtractor={(item, index) => `${item.id}`}
+          renderItem={_renderItem}
         />
-        <Button
-          title='enter'
-          onPress={() => setGetNewList(true)}
-          disabled={!freeText}
-        />
+        <View style={{ height: 100, justifyContent: 'space-around' }}>
+          <Button title='Get Stored list' onPress={() => getData()} />
+          <Button
+            title='clear list'
+            onPress={() => {
+              clearStorage('counter-key');
+            }}
+          />
+        </View>
       </View>
-      <FlatList
-        data={pantryList}
-        keyExtractor={(item, index) => `${item.id}`}
-        renderItem={_renderItem}
-      />
-    </View>
+    </Pressable>
   );
 }
 

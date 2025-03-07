@@ -1,6 +1,8 @@
 import {
   Button,
   FlatList,
+  Keyboard,
+  Pressable,
   StyleSheet,
   Text,
   TextInput,
@@ -10,33 +12,35 @@ import {
 import ItemCard from '../../components/Item';
 import { useState, useEffect } from 'react';
 import { Item } from '@/types/types';
+import { firstItem } from '@/constants/Utils';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
+import { clearStorage } from '@/api/device/storage';
 
 export default function CounterScreen() {
-  const [counterList, setCounterList] = useState<Item[]>([]);
+  const [counterList, setCounterList] = useState<Item[]>([firstItem]);
   const [freeText, setFreeText] = useState<string>('');
-  const [getNewList, setGetNewList] = useState<boolean>(false);
 
   useEffect(() => {
-    getData();
+    if (counterList.length === 1) {
+      storeData();
+      return;
+    }
+  }, [counterList]);
+
+  const storeData = async () => {
     let lastID =
       counterList && counterList.length > 0 ? counterList.at(-1).id : 1;
-
+    if (!freeText) return;
     const newListItem = {
       name: freeText,
       date: new Date().toString(),
       id: lastID + 1,
     };
-    if (getNewList) {
-      counterList.push(newListItem);
-      setGetNewList(false);
-      setFreeText('');
-      storeData();
-    }
-  }, [counterList, getNewList]);
+    counterList.push(newListItem);
+    setFreeText('');
 
-  const storeData = async () => {
     try {
       const jsonValue = JSON.stringify(counterList);
       await AsyncStorage.setItem('counter-key', jsonValue);
@@ -46,7 +50,6 @@ export default function CounterScreen() {
   };
 
   const getData = async () => {
-    if (counterList.length > 0) return null;
     try {
       const jsonValue = await AsyncStorage.getItem('counter-key');
       setCounterList(JSON.parse(jsonValue));
@@ -61,32 +64,45 @@ export default function CounterScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={{ flexDirection: 'row' }}>
-        <TextInput
-          style={{
-            height: 50,
-            width: 100,
-            backgroundColor: 'pink',
-            marginBottom: 12,
-            paddingLeft: 8,
-          }}
-          placeholder='Enter'
-          value={freeText}
-          onChangeText={setFreeText}
+    <Pressable style={styles.container} onPress={Keyboard.dismiss}>
+      <View>
+        <View style={{ flexDirection: 'row' }}>
+          <TextInput
+            style={{
+              height: 50,
+              width: 100,
+              backgroundColor: 'pink',
+              marginBottom: 12,
+              paddingLeft: 8,
+            }}
+            placeholder='e.g. bread'
+            value={freeText}
+            onChangeText={setFreeText}
+            enablesReturnKeyAutomatically
+            onSubmitEditing={() => storeData()}
+          />
+          <Button
+            title='enter'
+            onPress={() => storeData()}
+            disabled={!freeText}
+          />
+        </View>
+        <FlatList
+          data={counterList}
+          keyExtractor={(item, index) => `${item.id}`}
+          renderItem={_renderItem}
         />
-        <Button
-          title='enter'
-          onPress={() => setGetNewList(true)}
-          disabled={!freeText}
-        />
+        <View style={{ height: 100, justifyContent: 'space-around' }}>
+          <Button title='Get Stored list' onPress={() => getData()} />
+          <Button
+            title='clear list'
+            onPress={() => {
+              clearStorage('counter-key');
+            }}
+          />
+        </View>
       </View>
-      <FlatList
-        data={counterList}
-        keyExtractor={(item, index) => `${item.id}`}
-        renderItem={_renderItem}
-      />
-    </View>
+    </Pressable>
   );
 }
 

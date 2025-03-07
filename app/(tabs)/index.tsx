@@ -1,8 +1,9 @@
 import {
   Button,
   FlatList,
+  Keyboard,
+  Pressable,
   StyleSheet,
-  Text,
   TextInput,
   View,
 } from 'react-native';
@@ -10,37 +11,40 @@ import {
 import ItemCard from '../../components/Item';
 import { useState, useEffect } from 'react';
 import { Item } from '@/types/types';
+import { clearStorage } from '../../api/device/storage';
+import { firstItem } from '@/constants/Utils';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
 
 export default function RefrigeratorScreen() {
-  const [refrigeratorList, setRefrigeratorList] = useState<Item[]>([]);
+  const [refrigeratorList, setRefrigeratorList] = useState<Item[]>([firstItem]);
   const [freeText, setFreeText] = useState<string>('');
-  const [getNewList, setGetNewList] = useState<boolean>(false);
 
   useEffect(() => {
-    getData();
+    if (refrigeratorList.length === 1) {
+      storeData();
+      return;
+    }
+  }, [refrigeratorList]);
+
+  const storeData = async () => {
     let lastID =
       refrigeratorList && refrigeratorList.length > 0
         ? refrigeratorList.at(-1).id
         : 1;
+
+    if (!freeText) return;
 
     const newListItem = {
       name: freeText,
       date: new Date().toString(),
       id: lastID + 1,
     };
-    if (getNewList) {
-      refrigeratorList.push(newListItem);
-      setGetNewList(false);
-      setFreeText('');
-      storeData();
-    }
-  }, [refrigeratorList, getNewList]);
-
-  const storeData = async () => {
+    refrigeratorList.push(newListItem);
+    setFreeText('');
     try {
-      const jsonValue = JSON.stringify(refrigeratorList);
+      const jsonValue: string = JSON.stringify(refrigeratorList);
       await AsyncStorage.setItem('refrigerator-key', jsonValue);
     } catch (e) {
       // saving error
@@ -48,10 +52,8 @@ export default function RefrigeratorScreen() {
   };
 
   const getData = async () => {
-    if (refrigeratorList.length !== null) return null;
-    if (refrigeratorList.length > 0) return null;
     try {
-      const jsonValue = await AsyncStorage.getItem(`refrigerator-key`);
+      const jsonValue: string = await AsyncStorage.getItem('refrigerator-key');
       setRefrigeratorList(JSON.parse(jsonValue));
       return jsonValue;
     } catch (e) {
@@ -59,48 +61,50 @@ export default function RefrigeratorScreen() {
     }
   };
 
-  const removeValue = async () => {
-    try {
-      await AsyncStorage.removeItem('refrigerator-key');
-    } catch (e) {
-      // remove error
-    }
-
-    console.log('Done.');
-  };
-
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
     return <ItemCard name={item.name} />;
   };
 
   return (
-    <View style={styles.container}>
-      <View style={{ flexDirection: 'row' }}>
-        <TextInput
-          style={{
-            height: 50,
-            width: 100,
-            backgroundColor: 'pink',
-            marginBottom: 12,
-            paddingLeft: 8,
-          }}
-          placeholder='Enter'
-          value={freeText}
-          onChangeText={setFreeText}
+    <Pressable onPress={Keyboard.dismiss} style={styles.container}>
+      <View>
+        <View style={{ flexDirection: 'row' }}>
+          <TextInput
+            style={{
+              height: 50,
+              width: 100,
+              backgroundColor: 'pink',
+              marginBottom: 12,
+              paddingLeft: 8,
+            }}
+            placeholder='e.g. milk'
+            value={freeText}
+            onChangeText={setFreeText}
+            enablesReturnKeyAutomatically
+            onSubmitEditing={() => storeData()}
+          />
+          <Button
+            title='enter'
+            onPress={() => storeData()}
+            disabled={!freeText}
+          />
+        </View>
+        <FlatList
+          data={refrigeratorList}
+          keyExtractor={(item, index) => `${item.id}`}
+          renderItem={_renderItem}
         />
-        <Button
-          title='enter'
-          onPress={() => setGetNewList(true)}
-          disabled={!freeText}
-        />
+        <View style={{ height: 100, justifyContent: 'space-around' }}>
+          <Button title='Get Stored list' onPress={() => getData()} />
+          <Button
+            title='clear list'
+            onPress={() => {
+              clearStorage('refrigerator-key');
+            }}
+          />
+        </View>
       </View>
-      <FlatList
-        data={refrigeratorList}
-        keyExtractor={(item, index) => `${item.id}`}
-        renderItem={_renderItem}
-      />
-      <Button title='remove item' onPress={() => removeValue()} />
-    </View>
+    </Pressable>
   );
 }
 

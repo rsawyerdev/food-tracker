@@ -1,8 +1,8 @@
 import {
   Button,
   FlatList,
+  Pressable,
   StyleSheet,
-  Text,
   TextInput,
   View,
 } from 'react-native';
@@ -12,31 +12,35 @@ import { useState, useEffect } from 'react';
 import { Item } from '@/types/types';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
+import { clearStorage } from '@/api/device/storage';
+import { firstItem } from '@/constants/Utils';
 
 export default function FreezerScreen() {
-  const [freezerList, setFreezerList] = useState<Item[]>([]);
+  const [freezerList, setFreezerList] = useState<Item[]>([firstItem]);
   const [freeText, setFreeText] = useState<string>('');
-  const [getNewList, setGetNewList] = useState<boolean>(false);
 
   useEffect(() => {
-    getData();
+    if (freezerList.length === 1) {
+      storeData();
+      return;
+    }
+  }, [freezerList]);
+
+  const storeData = async () => {
     let lastID =
       freezerList && freezerList.length > 0 ? freezerList.at(-1).id : 1;
+
+    if (!freeText) return;
 
     const newListItem = {
       name: freeText,
       date: new Date().toString(),
       id: lastID + 1,
     };
-    if (getNewList) {
-      freezerList.push(newListItem);
-      setGetNewList(false);
-      setFreeText('');
-      storeData();
-    }
-  }, [freezerList, getNewList]);
+    freezerList.push(newListItem);
+    setFreeText('');
 
-  const storeData = async () => {
     try {
       const jsonValue = JSON.stringify(freezerList);
       await AsyncStorage.setItem('freezer-key', jsonValue);
@@ -46,7 +50,6 @@ export default function FreezerScreen() {
   };
 
   const getData = async () => {
-    if (freezerList.length > 0) return null;
     try {
       const jsonValue = await AsyncStorage.getItem('freezer-key');
       setFreezerList(JSON.parse(jsonValue));
@@ -61,32 +64,46 @@ export default function FreezerScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={{ flexDirection: 'row' }}>
-        <TextInput
-          style={{
-            height: 50,
-            width: 100,
-            backgroundColor: 'pink',
-            marginBottom: 12,
-            paddingLeft: 8,
-          }}
-          placeholder='Enter'
-          value={freeText}
-          onChangeText={setFreeText}
+    <Pressable style={styles.container}>
+      <View>
+        <View style={{ flexDirection: 'row' }}>
+          <TextInput
+            style={{
+              height: 50,
+              width: 100,
+              backgroundColor: 'pink',
+              marginBottom: 12,
+              paddingLeft: 8,
+            }}
+            placeholder='e.g. sausage'
+            value={freeText}
+            onChangeText={setFreeText}
+            enablesReturnKeyAutomatically
+            onSubmitEditing={() => storeData()}
+          />
+
+          <Button
+            title='enter'
+            onPress={() => storeData()}
+            disabled={!freeText}
+          />
+        </View>
+        <FlatList
+          data={freezerList}
+          keyExtractor={(item, index) => `${item.id}`}
+          renderItem={_renderItem}
         />
-        <Button
-          title='enter'
-          onPress={() => setGetNewList(true)}
-          disabled={!freeText}
-        />
+        <View style={{ height: 100, justifyContent: 'space-around' }}>
+          <Button title='Get Stored list' onPress={() => getData()} />
+          <Button
+            title='clear list'
+            onPress={() => {
+              clearStorage('freezer-key');
+            }}
+          />
+        </View>
       </View>
-      <FlatList
-        data={freezerList}
-        keyExtractor={(item, index) => `${item.id}`}
-        renderItem={_renderItem}
-      />
-    </View>
+    </Pressable>
   );
 }
 
