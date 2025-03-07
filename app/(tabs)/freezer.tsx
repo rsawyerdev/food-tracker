@@ -1,42 +1,109 @@
-import { Button, FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+  Button,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+} from 'react-native';
 
 import ItemCard from '../../components/Item';
 import { useState, useEffect } from 'react';
 import { Item } from '@/types/types';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
+import { clearStorage } from '@/api/device/storage';
+import { firstItem } from '@/constants/Utils';
 
 export default function FreezerScreen() {
-  const [freezerList, setFreezerList] = useState<Item[]>([
-  
-  ])
-  const [freeText, setFreeText] = useState<string>('')
-  const [getNewList, setGetNewList] = useState<boolean>(false)
+  const [freezerList, setFreezerList] = useState<Item[]>([firstItem]);
+  const [freeText, setFreeText] = useState<string>('');
 
-  useEffect(()=> {
-    let lastID =freezerList.length >0? freezerList.at(-1).id : 1
-    const newListItem = {name: freeText, date: "2024-11-21", id: lastID+1}
-    if(getNewList) {
-    freezerList.push(newListItem)
-    setGetNewList(false)
-    setFreeText('')
-    }  
-  })
+  useEffect(() => {
+    if (freezerList.length === 1) {
+      storeData();
+      return;
+    }
+  }, [freezerList]);
 
-  const _renderItem = ({item, index}: {item: any, index: number}) => {
-    return  <ItemCard name={item.name}/>
-    
+  const storeData = async () => {
+    let lastID =
+      freezerList && freezerList.length > 0 ? freezerList.at(-1).id : 1;
+
+    if (!freeText) return;
+
+    const newListItem = {
+      name: freeText,
+      date: new Date().toString(),
+      id: lastID + 1,
+    };
+    freezerList.push(newListItem);
+    setFreeText('');
+
+    try {
+      const jsonValue = JSON.stringify(freezerList);
+      await AsyncStorage.setItem('freezer-key', jsonValue);
+    } catch (e) {
+      // saving error
+    }
+  };
+
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('freezer-key');
+      setFreezerList(JSON.parse(jsonValue));
+      return jsonValue;
+    } catch (e) {
+      // error reading value
+    }
+  };
+
+  const _renderItem = ({ item, index }: { item: any; index: number }) => {
+    return <ItemCard name={item.name} />;
   };
 
   return (
-    <View style={styles.container}>
-      <View style={{flexDirection:'row'}}>
-      <TextInput style={{height: 50, width: 100, backgroundColor: 'pink', marginBottom: 12, paddingLeft: 8}} 
-        placeholder='Enter' value={freeText} onChangeText={setFreeText} />
-        <Button title='enter' onPress={()=>setGetNewList(true)} disabled={!freeText}/>
+    <Pressable style={styles.container}>
+      <View>
+        <View style={{ flexDirection: 'row' }}>
+          <TextInput
+            style={{
+              height: 50,
+              width: 100,
+              backgroundColor: 'pink',
+              marginBottom: 12,
+              paddingLeft: 8,
+            }}
+            placeholder='e.g. sausage'
+            value={freeText}
+            onChangeText={setFreeText}
+            enablesReturnKeyAutomatically
+            onSubmitEditing={() => storeData()}
+          />
+
+          <Button
+            title='enter'
+            onPress={() => storeData()}
+            disabled={!freeText}
+          />
+        </View>
+        <FlatList
+          data={freezerList}
+          keyExtractor={(item, index) => `${item.id}`}
+          renderItem={_renderItem}
+        />
+        <View style={{ height: 100, justifyContent: 'space-around' }}>
+          <Button title='Get Stored list' onPress={() => getData()} />
+          <Button
+            title='clear list'
+            onPress={() => {
+              clearStorage('freezer-key');
+            }}
+          />
+        </View>
       </View>
-      <FlatList data={freezerList} keyExtractor={(item, index) =>`${item.id}`} 
-      renderItem={ _renderItem } />
-    </View>
+    </Pressable>
   );
 }
 
@@ -45,7 +112,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 24
+    paddingVertical: 24,
   },
   title: {
     fontSize: 20,
