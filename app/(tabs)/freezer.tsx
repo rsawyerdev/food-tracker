@@ -8,11 +8,10 @@ import {
 } from 'react-native';
 
 import ItemCard from '../../components/Item';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Item } from '@/types/types';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React from 'react';
 import { clearStorage } from '@/api/device/storage';
 import { firstItem } from '@/constants/Utils';
 
