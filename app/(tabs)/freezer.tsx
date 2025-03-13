@@ -1,23 +1,20 @@
-import {
-  Button,
-  FlatList,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native';
+import { Button, FlatList, Pressable, StyleSheet, View } from 'react-native';
 
 import ItemCard from '../../components/Item';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Item } from '@/types/types';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { clearStorage } from '@/api/device/storage';
 import { firstItem } from '@/constants/Utils';
+import AddItem from '@/components/AddItem';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 export default function FreezerScreen() {
   const [freezerList, setFreezerList] = useState<Item[]>([firstItem]);
   const [freeText, setFreeText] = useState<string>('');
+
+  const addItemRef = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
     if (freezerList.length === 1) {
@@ -65,28 +62,6 @@ export default function FreezerScreen() {
   return (
     <Pressable style={styles.container}>
       <View>
-        <View style={{ flexDirection: 'row' }}>
-          <TextInput
-            style={{
-              height: 50,
-              width: 100,
-              backgroundColor: 'pink',
-              marginBottom: 12,
-              paddingLeft: 8,
-            }}
-            placeholder='e.g. sausage'
-            value={freeText}
-            onChangeText={setFreeText}
-            enablesReturnKeyAutomatically
-            onSubmitEditing={() => storeData()}
-          />
-
-          <Button
-            title='enter'
-            onPress={() => storeData()}
-            disabled={!freeText}
-          />
-        </View>
         <FlatList
           data={freezerList}
           keyExtractor={(item, index) => `${item.id}`}
@@ -99,6 +74,16 @@ export default function FreezerScreen() {
             onPress={() => {
               clearStorage('freezer-key');
             }}
+          />
+          <Button
+            title='Add Item'
+            onPress={() => addItemRef.current?.present()}
+          />
+          <AddItem
+            ref={addItemRef}
+            storeData={storeData}
+            freeText={freeText}
+            setFreeText={setFreeText}
           />
         </View>
       </View>
