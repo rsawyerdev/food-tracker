@@ -4,23 +4,26 @@ import {
   Keyboard,
   Pressable,
   StyleSheet,
-  Text,
-  TextInput,
   View,
+  KeyboardAvoidingView,
 } from 'react-native';
 
 import ItemCard from '../../components/Item';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Item } from '@/types/types';
 import { firstItem } from '@/constants/Utils';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
 import { clearStorage } from '@/api/device/storage';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import AddItem from '@/components/AddItem';
 
 export default function PantryScreen() {
   const [pantryList, setPantryList] = useState<Item[]>([firstItem]);
   const [freeText, setFreeText] = useState<string>('');
+
+  const addItemRef = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
     if (pantryList.length === 1) {
@@ -64,28 +67,7 @@ export default function PantryScreen() {
 
   return (
     <Pressable style={styles.container} onPress={Keyboard.dismiss}>
-      <View>
-        <View style={{ flexDirection: 'row' }}>
-          <TextInput
-            style={{
-              height: 50,
-              width: 100,
-              backgroundColor: 'pink',
-              marginBottom: 12,
-              paddingLeft: 8,
-            }}
-            placeholder='e.g rice'
-            value={freeText}
-            onChangeText={setFreeText}
-            enablesReturnKeyAutomatically
-            onSubmitEditing={() => storeData()}
-          />
-          <Button
-            title='enter'
-            onPress={() => storeData()}
-            disabled={!freeText}
-          />
-        </View>
+      <KeyboardAvoidingView behavior='padding'>
         <FlatList
           data={pantryList}
           keyExtractor={(item, index) => `${item.id}`}
@@ -99,8 +81,19 @@ export default function PantryScreen() {
               clearStorage('counter-key');
             }}
           />
+          <Button
+            title='Add Item'
+            onPress={() => addItemRef.current?.present()}
+          />
+          <AddItem
+            ref={addItemRef}
+            storeData={storeData}
+            getData={getData}
+            freeText={freeText}
+            setFreeText={setFreeText}
+          />
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Pressable>
   );
 }

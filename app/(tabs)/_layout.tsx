@@ -15,36 +15,54 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: true,
-        
-      }}>
+      }}
+    >
       <Tabs.Screen
-        name="index"
+        name='index'
         options={{
           title: 'Refrigerator',
-          tabBarIcon: () => <MaterialCommunityIcons name="fridge-bottom" size={24} color="black" />,
-         
-          
+          tabBarIcon: () => (
+            <MaterialCommunityIcons
+              name='fridge-bottom'
+              size={24}
+              color='black'
+            />
+          ),
         }}
       />
       <Tabs.Screen
-        name="freezer"
+        name='freezer'
         options={{
           title: 'Freezer',
-          tabBarIcon: () => <MaterialCommunityIcons name="fridge-top" size={24} color="black" />,
+          tabBarIcon: () => (
+            <MaterialCommunityIcons name='fridge-top' size={24} color='black' />
+          ),
         }}
       />
       <Tabs.Screen
-        name="pantry"
+        name='pantry'
         options={{
-          title: 'Panty',
-          tabBarIcon: () => <MaterialCommunityIcons name="bread-slice-outline" size={24} color="black" />,
+          title: 'Pantry',
+          tabBarIcon: () => (
+            <MaterialCommunityIcons
+              name='bread-slice-outline'
+              size={24}
+              color='black'
+            />
+          ),
         }}
       />
       <Tabs.Screen
-        name="counter"
+        name='counter'
         options={{
           title: 'Counter',
-          tabBarIcon: () => <MaterialCommunityIcons name="store-marker" size={24} color="black" />,
+          tabBarIcon: () => (
+            <MaterialCommunityIcons
+              name='store-marker'
+              size={24}
+              color='black'
+            />
+          ),
         }}
       />
     </Tabs>
