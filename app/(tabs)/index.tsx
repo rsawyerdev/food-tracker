@@ -33,7 +33,6 @@ export default function RefrigeratorScreen() {
   }, [refrigeratorList]);
 
   const storeData = async (action: string, list?: [Item]) => {
-    console.log('list', list);
     if (action == 'add') {
       let lastID =
         refrigeratorList && refrigeratorList.length > 0
