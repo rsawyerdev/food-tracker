@@ -25,29 +25,35 @@ export default function RefrigeratorScreen() {
   const addItemRef = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
+    if (refrigeratorList == null) return;
     if (refrigeratorList.length === 1) {
-      storeData();
+      storeData('add');
       return;
     }
   }, [refrigeratorList]);
 
-  const storeData = async () => {
-    let lastID =
-      refrigeratorList && refrigeratorList.length > 0
-        ? refrigeratorList.at(-1).id
-        : 1;
+  const storeData = async (action: string, list?: [Item]) => {
+    console.log('list', list);
+    if (action == 'add') {
+      let lastID =
+        refrigeratorList && refrigeratorList.length > 0
+          ? refrigeratorList.at(-1).id
+          : 1;
 
-    if (!freeText) return;
+      if (!freeText) return;
 
-    const newListItem = {
-      name: freeText,
-      date: new Date().toString(),
-      id: lastID + 1,
-    };
-    refrigeratorList.push(newListItem);
-    setFreeText('');
+      const newListItem = {
+        name: freeText,
+        date: new Date().toString(),
+        id: lastID + 1,
+      };
+      refrigeratorList.push(newListItem);
+      setFreeText('');
+    }
     try {
-      const jsonValue: string = JSON.stringify(refrigeratorList);
+      const jsonValue: string = JSON.stringify(
+        action == 'add' ? refrigeratorList : list
+      );
       await AsyncStorage.setItem('refrigerator-key', jsonValue);
     } catch (e) {
       // saving error
@@ -64,8 +70,14 @@ export default function RefrigeratorScreen() {
     }
   };
 
+  const deleteItem = (item: Item, index: number) => {
+    const newList = refrigeratorList.toSpliced(index, 1);
+    setRefrigeratorList(refrigeratorList.toSpliced(index, 1));
+    storeData('delete', newList);
+  };
+
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
-    return <ItemCard name={item.name} />;
+    return <ItemCard item={item} deleteItem={deleteItem} index={index} />;
   };
 
   return (

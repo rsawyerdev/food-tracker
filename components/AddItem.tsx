@@ -39,9 +39,13 @@ export default React.forwardRef(function (props, ref) {
             value={freeText}
             onChangeText={setFreeText}
             enablesReturnKeyAutomatically
-            onSubmitEditing={storeData}
+            onSubmitEditing={() => storeData('add')}
           />
-          <Button title='enter' onPress={storeData} disabled={!freeText} />
+          <Button
+            title='enter'
+            onPress={() => storeData('add')}
+            disabled={!freeText}
+          />
         </KeyboardAvoidingView>
       </BottomSheetView>
     </BottomSheetModal>
