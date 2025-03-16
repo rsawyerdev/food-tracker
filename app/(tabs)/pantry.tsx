@@ -20,7 +20,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import AddItem from '@/components/AddItem';
 
 export default function PantryScreen() {
-  const [pantryList, setPantryList] = useState<Item[]>([firstItem]);
+  const [pantryList, setPantryList] = useState<Item[]>([]);
   const [freeText, setFreeText] = useState<string>('');
 
   const addItemRef = useRef<BottomSheetModal>(null);
@@ -62,7 +62,7 @@ export default function PantryScreen() {
   };
 
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
-    return <ItemCard name={item.name} />;
+    return <ItemCard item={item} />;
   };
 
   return (

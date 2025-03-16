@@ -19,7 +19,7 @@ import AddItem from '@/components/AddItem';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 export default function CounterScreen() {
-  const [counterList, setCounterList] = useState<Item[]>([firstItem]);
+  const [counterList, setCounterList] = useState<Item[]>([]);
   const [freeText, setFreeText] = useState<string>('');
 
   const addItemRef = useRef<BottomSheetModal>(null);
@@ -62,7 +62,7 @@ export default function CounterScreen() {
   };
 
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
-    return <ItemCard name={item.name} />;
+    return <ItemCard item={item} />;
   };
 
   return (
