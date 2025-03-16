@@ -6,19 +6,18 @@ import { Item } from '@/types/types';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { clearStorage } from '@/api/device/storage';
-import { firstItem } from '@/constants/Utils';
 import AddItem from '@/components/AddItem';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 export default function FreezerScreen() {
-  const [freezerList, setFreezerList] = useState<Item[]>([firstItem]);
+  const [freezerList, setFreezerList] = useState<Item[]>([]);
   const [freeText, setFreeText] = useState<string>('');
 
   const addItemRef = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
-    if (freezerList.length === 1) {
-      storeData();
+    if (freezerList.length === 0 || !freezerList) {
+      getData();
       return;
     }
   }, [freezerList]);
@@ -56,7 +55,7 @@ export default function FreezerScreen() {
   };
 
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
-    return <ItemCard name={item.name} />;
+    return <ItemCard item={item} />;
   };
 
   return (
@@ -68,7 +67,6 @@ export default function FreezerScreen() {
           renderItem={_renderItem}
         />
         <View style={{ height: 100, justifyContent: 'space-around' }}>
-          <Button title='Get Stored list' onPress={() => getData()} />
           <Button
             title='clear list'
             onPress={() => {
