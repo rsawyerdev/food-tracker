@@ -20,14 +20,14 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import AddItem from '@/components/AddItem';
 
 export default function PantryScreen() {
-  const [pantryList, setPantryList] = useState<Item[]>([firstItem]);
+  const [pantryList, setPantryList] = useState<Item[]>([]);
   const [freeText, setFreeText] = useState<string>('');
 
   const addItemRef = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
-    if (pantryList.length === 1) {
-      storeData();
+    if (pantryList.length === 0 || !pantryList) {
+      getData();
       return;
     }
   }, [pantryList]);
@@ -62,7 +62,7 @@ export default function PantryScreen() {
   };
 
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
-    return <ItemCard name={item.name} />;
+    return <ItemCard item={item} />;
   };
 
   return (
@@ -74,7 +74,6 @@ export default function PantryScreen() {
           renderItem={_renderItem}
         />
         <View style={{ height: 100, justifyContent: 'space-around' }}>
-          <Button title='Get Stored list' onPress={() => getData()} />
           <Button
             title='clear list'
             onPress={() => {

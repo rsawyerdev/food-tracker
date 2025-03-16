@@ -19,14 +19,14 @@ import AddItem from '@/components/AddItem';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 export default function CounterScreen() {
-  const [counterList, setCounterList] = useState<Item[]>([firstItem]);
+  const [counterList, setCounterList] = useState<Item[]>([]);
   const [freeText, setFreeText] = useState<string>('');
 
   const addItemRef = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
-    if (counterList.length === 1) {
-      storeData();
+    if (counterList.length === 0 || !counterList) {
+      getData();
       return;
     }
   }, [counterList]);
@@ -62,7 +62,7 @@ export default function CounterScreen() {
   };
 
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
-    return <ItemCard name={item.name} />;
+    return <ItemCard item={item} />;
   };
 
   return (
@@ -74,7 +74,6 @@ export default function CounterScreen() {
           renderItem={_renderItem}
         />
         <View style={{ height: 100, justifyContent: 'space-around' }}>
-          <Button title='Get Stored list' onPress={() => getData()} />
           <Button
             title='clear list'
             onPress={() => {
