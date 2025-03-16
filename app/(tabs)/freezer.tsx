@@ -16,8 +16,8 @@ export default function FreezerScreen() {
   const addItemRef = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
-    if (freezerList.length === 1) {
-      storeData();
+    if (freezerList.length === 0 || !freezerList) {
+      getData();
       return;
     }
   }, [freezerList]);
@@ -67,7 +67,6 @@ export default function FreezerScreen() {
           renderItem={_renderItem}
         />
         <View style={{ height: 100, justifyContent: 'space-around' }}>
-          <Button title='Get Stored list' onPress={() => getData()} />
           <Button
             title='clear list'
             onPress={() => {

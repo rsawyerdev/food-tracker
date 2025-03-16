@@ -25,8 +25,8 @@ export default function CounterScreen() {
   const addItemRef = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
-    if (counterList.length === 1) {
-      storeData();
+    if (counterList.length === 0 || !counterList) {
+      getData();
       return;
     }
   }, [counterList]);
@@ -74,7 +74,6 @@ export default function CounterScreen() {
           renderItem={_renderItem}
         />
         <View style={{ height: 100, justifyContent: 'space-around' }}>
-          <Button title='Get Stored list' onPress={() => getData()} />
           <Button
             title='clear list'
             onPress={() => {

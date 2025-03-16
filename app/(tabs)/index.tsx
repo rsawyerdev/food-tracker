@@ -24,9 +24,8 @@ export default function RefrigeratorScreen() {
   const addItemRef = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
-    if (refrigeratorList == null) return;
-    if (refrigeratorList.length === 1) {
-      storeData('add');
+    if (refrigeratorList.length === 0 || !refrigeratorList) {
+      getData();
       return;
     }
   }, [refrigeratorList]);
@@ -87,7 +86,6 @@ export default function RefrigeratorScreen() {
           renderItem={_renderItem}
         />
         <View style={{ height: 100, justifyContent: 'space-around' }}>
-          <Button title='Get Stored list' onPress={() => getData()} />
           <Button
             title='clear list'
             onPress={() => {

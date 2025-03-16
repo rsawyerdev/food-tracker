@@ -26,8 +26,8 @@ export default function PantryScreen() {
   const addItemRef = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
-    if (pantryList.length === 1) {
-      storeData();
+    if (pantryList.length === 0 || !pantryList) {
+      getData();
       return;
     }
   }, [pantryList]);
@@ -74,7 +74,6 @@ export default function PantryScreen() {
           renderItem={_renderItem}
         />
         <View style={{ height: 100, justifyContent: 'space-around' }}>
-          <Button title='Get Stored list' onPress={() => getData()} />
           <Button
             title='clear list'
             onPress={() => {
