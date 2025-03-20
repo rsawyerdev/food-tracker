@@ -65,6 +65,15 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name='recipes'
+        options={{
+          title: 'Recipes',
+          tabBarIcon: () => (
+            <FontAwesome name='list-alt' size={24} color='black' />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
