@@ -16,4 +16,9 @@ export const RecipeList = [
       'onion',
     ],
   },
+  {
+    title: 'Scrambled eggs',
+    link: '',
+    ingredients: ['milk', 'salt and pepper', 'eggs'],
+  },
 ];

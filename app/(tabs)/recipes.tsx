@@ -14,9 +14,12 @@ import { RecipeList } from '../../constants/RecipeList';
 
 export default function Recipes() {
   const [allItems, setAllItems] = useState();
-  const [remainingIngredients, setRemainingIngredients] = useState();
-  const [recipeTitle, setRecipeTitle] = useState();
-  const [recipeLink, setRecipeLink] = useState();
+  const [remainingIngredients, setRemainingIngredients] = useState<string[]>(
+    []
+  );
+  const [recipeTitle, setRecipeTitle] = useState<string>('');
+  const [recipeLink, setRecipeLink] = useState<string>('');
+  const [recipeOpen, setRecipeOpen] = useState<boolean>(false);
 
   const getData = async () => {
     try {
@@ -44,28 +47,26 @@ export default function Recipes() {
     }
   };
 
-  const findItems = (allItems: any) => {
+  const findItems = (allItems: any, title?: string) => {
     for (let item of allItems) {
-      RecipeList.map((recipe: any) =>
-        recipe.ingredients.map((ingredient: string, index: number) => {
-          if (item.name == ingredient) {
-            recipe.ingredients.splice(index, 1);
-            setRecipeLink(recipe.link);
-            setRecipeTitle(recipe.title);
-            setRemainingIngredients(recipe.ingredients);
+      RecipeList.map((recipes: any) => {
+        for (let recipe of RecipeList) {
+          if (recipe.title == title) {
+            recipe.ingredients.map((ingredient: string, index: number) => {
+              if (item.name == ingredient) {
+                recipe.ingredients.splice(index, 1);
+                setRecipeLink(recipe.link);
+                setRecipeTitle(recipe.title);
+                setRemainingIngredients(recipe.ingredients);
+                setRecipeOpen(true);
+              }
+            });
           }
-        })
-      );
+        }
+      });
     }
   };
-  const _renderItem = (item: Item) => {
-    // const newItem = item.item.map((i) => console.log('i', i));
-    return (
-      <View>
-        <Text>{item.name}</Text>
-      </View>
-    );
-  };
+
   return (
     <View style={styles.container}>
       <Button title='Get Data' onPress={() => getData()} />
@@ -80,10 +81,19 @@ export default function Recipes() {
           }
           data={remainingIngredients}
           renderItem={(ingredient) => (
-            <View>
+            <Pressable onPress={() => findItems(allItems, ingredient.item)}>
               <Text>{ingredient.item}</Text>
-            </View>
+            </Pressable>
           )}
+          ListFooterComponent={
+            <View style={{ marginTop: 20 }}>
+              {RecipeList.map((recipe) => (
+                <Pressable onPress={() => findItems(allItems, recipe.title)}>
+                  <Text>{recipe.title}</Text>
+                </Pressable>
+              ))}
+            </View>
+          }
         />
       </View>
     </View>
