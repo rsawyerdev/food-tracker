@@ -19,13 +19,14 @@ import AddItem from '@/components/AddItem';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 export default function CounterScreen() {
-  const [counterList, setCounterList] = useState<Item[]>([]);
+  const [counterList, setCounterList] = useState<Item[]>([firstItem]);
   const [freeText, setFreeText] = useState<string>('');
 
   const addItemRef = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
-    if (counterList.length === 0 || !counterList) {
+    if (!counterList) return;
+    if (counterList.length === 0) {
       getData();
       return;
     }
