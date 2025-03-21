@@ -8,15 +8,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { clearStorage } from '@/api/device/storage';
 import AddItem from '@/components/AddItem';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { firstItem } from '@/constants/Utils';
 
 export default function FreezerScreen() {
-  const [freezerList, setFreezerList] = useState<Item[]>([]);
+  const [freezerList, setFreezerList] = useState<Item[]>([firstItem]);
   const [freeText, setFreeText] = useState<string>('');
 
   const addItemRef = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
-    if (freezerList.length === 0 || !freezerList) {
+    if (!freezerList) return;
+    if (freezerList.length === 0) {
       getData();
       return;
     }

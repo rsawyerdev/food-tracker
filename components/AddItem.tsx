@@ -4,6 +4,7 @@ import {
   BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
+import { Autocomplete, TextField } from '@mui/material';
 import React, { useCallback } from 'react';
 import { Button, KeyboardAvoidingView, StyleSheet } from 'react-native';
 
@@ -25,6 +26,23 @@ export default React.forwardRef(function (props, ref) {
 
   const handleSnap = [160];
 
+  const suggestions = [
+    'salt',
+    'pepper',
+    'olive oil',
+    'bread',
+    'milk',
+    'eggs',
+    'chicken breast',
+    'whole chicken',
+    'carrots',
+    'apples',
+    'lemons',
+    'blueberries',
+    'yogurt',
+    'salmon',
+  ];
+
   return (
     <BottomSheetModal
       ref={ref}
@@ -33,13 +51,16 @@ export default React.forwardRef(function (props, ref) {
     >
       <BottomSheetView>
         <KeyboardAvoidingView style={styles.textContainer} behavior='padding'>
-          <BottomSheetTextInput
-            style={styles.textInput}
-            placeholder='e.g. milk'
-            value={freeText}
-            onChangeText={setFreeText}
-            enablesReturnKeyAutomatically
-            onSubmitEditing={() => storeData('add')}
+          <Autocomplete
+            disablePortal
+            freeSolo
+            options={suggestions}
+            onChange={(event, newValue) => setFreeText(newValue)}
+            sx={{ width: 300 }}
+            renderInput={(params) => (
+              <TextField {...params} label='Food item' />
+            )}
+            onKeyDown={(press) => press.key == 'Enter' && storeData()}
           />
           <Button
             title='enter'
