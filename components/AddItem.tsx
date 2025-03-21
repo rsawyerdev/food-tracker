@@ -53,6 +53,7 @@ export default React.forwardRef(function (props, ref) {
         <KeyboardAvoidingView style={styles.textContainer} behavior='padding'>
           <Autocomplete
             disablePortal
+            freeSolo
             options={suggestions}
             onChange={(event, newValue) => setFreeText(newValue)}
             sx={{ width: 300 }}
