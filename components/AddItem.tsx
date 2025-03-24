@@ -1,15 +1,16 @@
-import {
+import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import { Autocomplete, TextField } from '@mui/material';
-import React, { useCallback } from 'react';
-import { Button, KeyboardAvoidingView, StyleSheet } from 'react-native';
+import React, { useCallback, useRef, useState } from 'react';
+import { Button, FlatList, StyleSheet, View, Text } from 'react-native';
 
 export default React.forwardRef(function (props, ref) {
   const { storeData, freeText, setFreeText } = props;
+  const [loading, setLoading] = useState(false);
+  const [suggestionsList, setSuggestionsList] = useState(null);
 
   const renderBackdrop = useCallback(
     (props: any) => (
@@ -24,24 +25,47 @@ export default React.forwardRef(function (props, ref) {
     []
   );
 
-  const handleSnap = [160];
+  const handleSnap = [250];
 
   const suggestions = [
-    'salt',
-    'pepper',
-    'olive oil',
-    'bread',
-    'milk',
-    'eggs',
-    'chicken breast',
-    'whole chicken',
-    'carrots',
-    'apples',
-    'lemons',
-    'blueberries',
-    'yogurt',
-    'salmon',
+    { title: 'salt', id: '1' },
+    { title: 'pepper', id: '2' },
+    { title: 'bread', id: '3' },
+    { title: 'milk', id: '4' },
+    { title: 'eggs', id: '5' },
+    { title: 'chicken breast', id: '6' },
+    { title: 'whole chicken', id: '7' },
+    { title: 'carrots', id: '8' },
+    { title: 'apples', id: '9' },
+    { title: 'lemons', id: '10' },
+    { title: 'blueberries', id: '11' },
+    { title: 'yogurt', id: '12' },
+    { title: 'salmon', id: '13' },
   ];
+
+  const getSuggestions = useCallback(async (q) => {
+    const filterToken = q.toLowerCase();
+    setFreeText(filterToken);
+
+    if (typeof q !== 'string' || q.length < 2) {
+      setSuggestionsList(null);
+      return;
+    }
+    setLoading(true);
+    const suggestionList = suggestions
+      .filter((item) => item.title.toLowerCase().includes(filterToken))
+      .map((item) => ({
+        id: item.id,
+        title: item.title,
+      }));
+    console.log('after filter', suggestionList);
+    setSuggestionsList(suggestionList);
+    setLoading(false);
+  }, []);
+
+  const onClearPress = useCallback(() => {
+    setSuggestionsList(null);
+  }, []);
 
   return (
     <BottomSheetModal
@@ -49,25 +73,36 @@ export default React.forwardRef(function (props, ref) {
       snapPoints={handleSnap}
       backdropComponent={renderBackdrop}
     >
-      <BottomSheetView>
-        <KeyboardAvoidingView style={styles.textContainer} behavior='padding'>
-          <Autocomplete
-            disablePortal
-            freeSolo
-            options={suggestions}
-            onChange={(event, newValue) => setFreeText(newValue)}
-            sx={{ width: 300 }}
-            renderInput={(params) => (
-              <TextField {...params} label='Food item' />
-            )}
-            onKeyDown={(press) => press.key == 'Enter' && storeData()}
-          />
-          <Button
-            title='enter'
-            onPress={() => storeData('add')}
-            disabled={!freeText}
-          />
-        </KeyboardAvoidingView>
+      <BottomSheetView
+        style={{
+          flex: 1,
+          height: 500,
+          justifyContent: 'space-around',
+          alignItems: 'center',
+        }}
+      >
+        <BottomSheetTextInput
+          style={styles.textInput}
+          placeholder='e.g. milk'
+          value={freeText}
+          onChangeText={setFreeText && getSuggestions}
+          enablesReturnKeyAutomatically
+          onSubmitEditing={() => storeData('add')}
+        />
+        <FlatList
+          data={suggestionsList}
+          renderItem={(suggestion) => (
+            <View>
+              <Text>{suggestion.item.title}</Text>
+            </View>
+          )}
+        />
+
+        <Button
+          title='enter'
+          onPress={() => storeData('add')}
+          disabled={!freeText}
+        />
       </BottomSheetView>
     </BottomSheetModal>
   );
