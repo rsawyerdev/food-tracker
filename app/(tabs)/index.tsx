@@ -12,6 +12,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Item } from '@/types/types';
 import { clearStorage } from '../../api/device/storage';
 import AddItem from '@/components/AddItem';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
@@ -22,9 +23,9 @@ export default function RefrigeratorScreen() {
   const [freeText, setFreeText] = useState<string>('');
 
   const addItemRef = useRef<BottomSheetModal>(null);
-
   useEffect(() => {
-    if (refrigeratorList.length === 0 || !refrigeratorList) {
+    if (!refrigeratorList) return;
+    if (refrigeratorList.length === 0) {
       getData();
       return;
     }
@@ -79,6 +80,12 @@ export default function RefrigeratorScreen() {
 
   return (
     <Pressable onPress={Keyboard.dismiss} style={styles.container}>
+      <Pressable
+        style={[styles.additionIcon]}
+        onPress={() => addItemRef.current?.present()}
+      >
+        <AntDesign name='pluscircleo' size={48} color='black' />
+      </Pressable>
       <View>
         <FlatList
           data={refrigeratorList}
@@ -92,10 +99,7 @@ export default function RefrigeratorScreen() {
               clearStorage('refrigerator-key');
             }}
           />
-          <Button
-            title='Add Item'
-            onPress={() => addItemRef.current?.present()}
-          />
+
           <AddItem
             ref={addItemRef}
             storeData={storeData}
@@ -123,5 +127,14 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     height: 1,
     width: '80%',
+  },
+  additionIcon: {
+    position: 'absolute',
+    left: 12,
+    bottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 0.5,
   },
 });

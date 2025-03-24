@@ -18,6 +18,7 @@ import React from 'react';
 import { clearStorage } from '@/api/device/storage';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import AddItem from '@/components/AddItem';
+import { AntDesign } from '@expo/vector-icons';
 
 export default function PantryScreen() {
   const [pantryList, setPantryList] = useState<Item[]>([]);
@@ -80,10 +81,7 @@ export default function PantryScreen() {
               clearStorage('counter-key');
             }}
           />
-          <Button
-            title='Add Item'
-            onPress={() => addItemRef.current?.present()}
-          />
+
           <AddItem
             ref={addItemRef}
             storeData={storeData}
@@ -92,6 +90,12 @@ export default function PantryScreen() {
             setFreeText={setFreeText}
           />
         </View>
+        <Pressable
+          style={[styles.additionIcon]}
+          onPress={() => addItemRef.current?.present()}
+        >
+          <AntDesign name='pluscircleo' size={48} color='black' />
+        </Pressable>
       </KeyboardAvoidingView>
     </Pressable>
   );
@@ -112,5 +116,14 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     height: 1,
     width: '80%',
+  },
+  additionIcon: {
+    position: 'absolute',
+    left: 12,
+    bottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 0.5,
   },
 });

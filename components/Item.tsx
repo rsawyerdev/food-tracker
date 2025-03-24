@@ -39,7 +39,7 @@ export default function ItemCard(props: any) {
   };
 
   return (
-    <View style={[styles.container, containerStyle, { width: width / 2 }]}>
+    <View style={[styles.container, containerStyle, { width: width }]}>
       <View
         style={{
           borderColor: 'black',
@@ -63,10 +63,10 @@ export default function ItemCard(props: any) {
           />
         )}
       </View>
-      <View>
+      <View style={styles.deleteButton}>
         <Button
           title='Delete'
-          color={'red'}
+          color={'white'}
           onPress={() => deleteItem(item, index)}
         />
       </View>
@@ -92,6 +92,8 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   deleteButton: {
-    color: 'red',
+    borderRadius: 10,
+
+    backgroundColor: 'red',
   },
 });

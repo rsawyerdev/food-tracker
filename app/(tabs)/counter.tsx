@@ -17,6 +17,7 @@ import React from 'react';
 import { clearStorage } from '@/api/device/storage';
 import AddItem from '@/components/AddItem';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { AntDesign } from '@expo/vector-icons';
 
 export default function CounterScreen() {
   const [counterList, setCounterList] = useState<Item[]>([firstItem]);
@@ -81,10 +82,7 @@ export default function CounterScreen() {
               clearStorage('counter-key');
             }}
           />
-          <Button
-            title='Add Item'
-            onPress={() => addItemRef.current?.present()}
-          />
+
           <AddItem
             ref={addItemRef}
             storeData={storeData}
@@ -92,6 +90,12 @@ export default function CounterScreen() {
             setFreeText={setFreeText}
           />
         </View>
+        <Pressable
+          style={[styles.additionIcon]}
+          onPress={() => addItemRef.current?.present()}
+        >
+          <AntDesign name='pluscircleo' size={48} color='black' />
+        </Pressable>
       </View>
     </Pressable>
   );
@@ -112,5 +116,14 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     height: 1,
     width: '80%',
+  },
+  additionIcon: {
+    position: 'absolute',
+    left: 12,
+    bottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 0.5,
   },
 });
