@@ -33,20 +33,21 @@ export default function CounterScreen() {
     }
   }, [counterList]);
 
-  const storeData = async () => {
-    let lastID =
-      counterList && counterList.length > 0 ? counterList.at(-1).id : 1;
-    if (!freeText) return;
-    const newListItem = {
-      name: freeText,
-      date: new Date().toString(),
-      id: lastID + 1,
-    };
-    counterList.push(newListItem);
-    setFreeText('');
-
+  const storeData = async (action: string, list: [Item]) => {
+    if (action == 'add') {
+      let lastID =
+        counterList && counterList.length > 0 ? counterList.at(-1).id : 1;
+      if (!freeText) return;
+      const newListItem = {
+        name: freeText,
+        date: new Date().toString(),
+        id: lastID + 1,
+      };
+      counterList.push(newListItem);
+      setFreeText('');
+    }
     try {
-      const jsonValue = JSON.stringify(counterList);
+      const jsonValue = JSON.stringify(action == 'delete' ? list : counterList);
       await AsyncStorage.setItem('counter-key', jsonValue);
     } catch (e) {
       // saving error
@@ -63,8 +64,14 @@ export default function CounterScreen() {
     }
   };
 
+  const deleteItem = (item: Item, index: number) => {
+    const newList = counterList.toSpliced(index, 1);
+    setCounterList(newList);
+    storeData('delete', newList);
+  };
+
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
-    return <ItemCard item={item} />;
+    return <ItemCard item={item} deleteItem={deleteItem} index={index} />;
   };
 
   return (

@@ -25,22 +25,23 @@ export default function FreezerScreen() {
     }
   }, [freezerList]);
 
-  const storeData = async () => {
-    let lastID =
-      freezerList && freezerList.length > 0 ? freezerList.at(-1).id : 1;
+  const storeData = async (action: string, list: [Item]) => {
+    if (action == 'add') {
+      let lastID =
+        freezerList && freezerList.length > 0 ? freezerList.at(-1).id : 1;
 
-    if (!freeText) return;
+      if (!freeText) return;
 
-    const newListItem = {
-      name: freeText,
-      date: new Date().toString(),
-      id: lastID + 1,
-    };
-    freezerList.push(newListItem);
-    setFreeText('');
-
+      const newListItem = {
+        name: freeText,
+        date: new Date().toString(),
+        id: lastID + 1,
+      };
+      freezerList.push(newListItem);
+      setFreeText('');
+    }
     try {
-      const jsonValue = JSON.stringify(freezerList);
+      const jsonValue = JSON.stringify(action == 'delete' ? list : freezerList);
       await AsyncStorage.setItem('freezer-key', jsonValue);
     } catch (e) {
       // saving error
@@ -57,8 +58,14 @@ export default function FreezerScreen() {
     }
   };
 
+  const deleteItem = (item: Item, index: number) => {
+    const newList = freezerList.toSpliced(index, 1);
+    setFreezerList(newList);
+    storeData('delete', newList);
+  };
+
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
-    return <ItemCard item={item} />;
+    return <ItemCard item={item} index={index} deleteItem={deleteItem} />;
   };
 
   return (
