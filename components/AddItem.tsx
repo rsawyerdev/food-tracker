@@ -1,4 +1,5 @@
-import BottomSheet, {
+import { suggestions } from '@/constants/Utils';
+import {
   BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetTextInput,
@@ -6,6 +7,7 @@ import BottomSheet, {
 } from '@gorhom/bottom-sheet';
 import React, { useCallback, useRef, useState } from 'react';
 import { Button, FlatList, StyleSheet, View, Text } from 'react-native';
+import { Pressable } from 'react-native-gesture-handler';
 
 export default React.forwardRef(function (props, ref) {
   const { storeData, freeText, setFreeText } = props;
@@ -25,29 +27,13 @@ export default React.forwardRef(function (props, ref) {
     []
   );
 
-  const handleSnap = [250];
-
-  const suggestions = [
-    { title: 'salt', id: '1' },
-    { title: 'pepper', id: '2' },
-    { title: 'bread', id: '3' },
-    { title: 'milk', id: '4' },
-    { title: 'eggs', id: '5' },
-    { title: 'chicken breast', id: '6' },
-    { title: 'whole chicken', id: '7' },
-    { title: 'carrots', id: '8' },
-    { title: 'apples', id: '9' },
-    { title: 'lemons', id: '10' },
-    { title: 'blueberries', id: '11' },
-    { title: 'yogurt', id: '12' },
-    { title: 'salmon', id: '13' },
-  ];
+  const handleSnap = [300];
 
   const getSuggestions = useCallback(async (q) => {
     const filterToken = q.toLowerCase();
     setFreeText(filterToken);
 
-    if (typeof q !== 'string' || q.length < 2) {
+    if (typeof q !== 'string' || q.length < 1) {
       setSuggestionsList(null);
       return;
     }
@@ -58,7 +44,6 @@ export default React.forwardRef(function (props, ref) {
         id: item.id,
         title: item.title,
       }));
-    console.log('after filter', suggestionList);
     setSuggestionsList(suggestionList);
     setLoading(false);
   }, []);
@@ -76,32 +61,39 @@ export default React.forwardRef(function (props, ref) {
       <BottomSheetView
         style={{
           flex: 1,
-          height: 500,
+          height: 300,
           justifyContent: 'space-around',
           alignItems: 'center',
         }}
       >
-        <BottomSheetTextInput
-          style={styles.textInput}
-          placeholder='e.g. milk'
-          value={freeText}
-          onChangeText={setFreeText && getSuggestions}
-          enablesReturnKeyAutomatically
-          onSubmitEditing={() => storeData('add')}
-        />
+        <View style={styles.textContainer}>
+          <BottomSheetTextInput
+            style={[styles.textInput]}
+            placeholder={freeText}
+            value={freeText}
+            onChangeText={setFreeText && getSuggestions}
+            enablesReturnKeyAutomatically
+            onSubmitEditing={() => setFreeText('')}
+            clearTextOnFocus
+          />
+          <View>
+            <Button
+              title='enter'
+              onPress={() => storeData('add')}
+              disabled={!freeText}
+              color='blue'
+            />
+          </View>
+        </View>
         <FlatList
           data={suggestionsList}
           renderItem={(suggestion) => (
             <View>
-              <Text>{suggestion.item.title}</Text>
+              <Pressable onPress={() => setFreeText(suggestion.item.title)}>
+                <Text style={[styles.itemText]}>{suggestion.item.title}</Text>
+              </Pressable>
             </View>
           )}
-        />
-
-        <Button
-          title='enter'
-          onPress={() => storeData('add')}
-          disabled={!freeText}
         />
       </BottomSheetView>
     </BottomSheetModal>
@@ -112,14 +104,18 @@ const styles = StyleSheet.create({
   container: {},
   textInput: {
     height: 50,
-    width: 100,
-    backgroundColor: 'pink',
+    width: 150,
+    fontSize: 18,
     marginBottom: 12,
     paddingLeft: 8,
+    backgroundColor: 'lightblue',
   },
   textContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    height: 160,
+  },
+  itemText: {
+    paddingVertical: 5,
+    fontSize: 18,
   },
 });

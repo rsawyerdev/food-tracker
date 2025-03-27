@@ -6,6 +6,7 @@ import {
   Text,
   Pressable,
   useWindowDimensions,
+  Platform,
 } from 'react-native';
 import React, { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -14,6 +15,7 @@ export default function ItemCard(props: any) {
   const [date, setDate] = useState(new Date(Date.now()));
   const [mode, setMode] = useState('date');
   const [show, setShow] = useState(false);
+  const web = Platform.OS == 'web';
 
   const { deleteItem, containerStyle, item, index } = props;
 
@@ -66,7 +68,7 @@ export default function ItemCard(props: any) {
       <View style={styles.deleteButton}>
         <Button
           title='Delete'
-          color={'white'}
+          color={web ? 'red' : 'white'}
           onPress={() => deleteItem(item, index)}
         />
       </View>
@@ -93,7 +95,7 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     borderRadius: 10,
-
+    color: 'red',
     backgroundColor: 'red',
   },
 });

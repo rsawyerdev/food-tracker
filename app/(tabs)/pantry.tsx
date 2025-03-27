@@ -33,19 +33,21 @@ export default function PantryScreen() {
     }
   }, [pantryList]);
 
-  const storeData = async () => {
-    let lastID = pantryList && pantryList.length > 0 ? pantryList.at(-1).id : 1;
-    if (!freeText) return;
-    const newListItem = {
-      name: freeText,
-      date: new Date().toString(),
-      id: lastID + 1,
-    };
-    pantryList.push(newListItem);
-    setFreeText('');
-
+  const storeData = async (action: string, list: [Item]) => {
+    if (action == 'add') {
+      let lastID =
+        pantryList && pantryList.length > 0 ? pantryList.at(-1).id : 1;
+      if (!freeText) return;
+      const newListItem = {
+        name: freeText,
+        date: new Date().toString(),
+        id: lastID + 1,
+      };
+      pantryList.push(newListItem);
+      setFreeText('');
+    }
     try {
-      const jsonValue = JSON.stringify(pantryList);
+      const jsonValue = JSON.stringify(action == 'add' ? pantryList : list);
       await AsyncStorage.setItem('pantry-key', jsonValue);
     } catch (e) {
       // saving error
@@ -62,8 +64,14 @@ export default function PantryScreen() {
     }
   };
 
+  const deleteItem = (item: Item, index: number) => {
+    const newList = pantryList.toSpliced(index, 1);
+    setPantryList(newList);
+    storeData('delete', newList);
+  };
+
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
-    return <ItemCard item={item} />;
+    return <ItemCard item={item} deleteItem={deleteItem} index={index} />;
   };
 
   return (
