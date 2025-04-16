@@ -17,21 +17,22 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { firstItem } from '@/constants/Utils';
 
 export default function RefrigeratorScreen() {
-  const [refrigeratorList, setRefrigeratorList] = useState<Item[]>([]);
+  const [refrigeratorList, setRefrigeratorList] = useState<Item[]>([firstItem]);
   const [freeText, setFreeText] = useState<string>('');
 
   const addItemRef = useRef<BottomSheetModal>(null);
   useEffect(() => {
     if (!refrigeratorList) return;
-    if (refrigeratorList.length === 0) {
+    if (refrigeratorList.length === 1) {
       getData();
       return;
     }
   }, [refrigeratorList]);
 
-  const storeData = async (action: string, list?: [Item]) => {
+  const storeData = async (action: string, list?: Item[]) => {
     if (action == 'add') {
       let lastID =
         refrigeratorList && refrigeratorList.length > 0
@@ -60,7 +61,8 @@ export default function RefrigeratorScreen() {
 
   const getData = async () => {
     try {
-      const jsonValue: string = await AsyncStorage.getItem('refrigerator-key');
+      const jsonValue = await AsyncStorage.getItem('refrigerator-key');
+      if (jsonValue == null) return;
       setRefrigeratorList(JSON.parse(jsonValue));
       return jsonValue;
     } catch (e) {

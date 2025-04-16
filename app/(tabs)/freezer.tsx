@@ -1,4 +1,11 @@
-import { Button, FlatList, Pressable, StyleSheet, View } from 'react-native';
+import {
+  Button,
+  FlatList,
+  Keyboard,
+  Pressable,
+  StyleSheet,
+  View,
+} from 'react-native';
 
 import ItemCard from '../../components/Item';
 import React, { useState, useEffect, useRef } from 'react';
@@ -16,16 +23,15 @@ export default function FreezerScreen() {
   const [freeText, setFreeText] = useState<string>('');
 
   const addItemRef = useRef<BottomSheetModal>(null);
-
   useEffect(() => {
     if (!freezerList) return;
-    if (freezerList.length === 0) {
+    if (freezerList.length === 1) {
       getData();
       return;
     }
   }, [freezerList]);
 
-  const storeData = async (action: string, list: [Item]) => {
+  const storeData = async (action: string, list?: Item[]) => {
     if (action == 'add') {
       let lastID =
         freezerList && freezerList.length > 0 ? freezerList.at(-1).id : 1;
@@ -41,7 +47,9 @@ export default function FreezerScreen() {
       setFreeText('');
     }
     try {
-      const jsonValue = JSON.stringify(action == 'delete' ? list : freezerList);
+      const jsonValue: string = JSON.stringify(
+        action == 'add' ? freezerList : list
+      );
       await AsyncStorage.setItem('freezer-key', jsonValue);
     } catch (e) {
       // saving error
@@ -51,6 +59,7 @@ export default function FreezerScreen() {
   const getData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('freezer-key');
+      if (jsonValue == null) return;
       setFreezerList(JSON.parse(jsonValue));
       return jsonValue;
     } catch (e) {
@@ -65,11 +74,17 @@ export default function FreezerScreen() {
   };
 
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
-    return <ItemCard item={item} index={index} deleteItem={deleteItem} />;
+    return <ItemCard item={item} deleteItem={deleteItem} index={index} />;
   };
 
   return (
-    <Pressable style={styles.container}>
+    <Pressable onPress={Keyboard.dismiss} style={styles.container}>
+      <Pressable
+        style={[styles.additionIcon]}
+        onPress={() => addItemRef.current?.present()}
+      >
+        <AntDesign name='pluscircleo' size={48} color='black' />
+      </Pressable>
       <View>
         <FlatList
           data={freezerList}
@@ -91,12 +106,6 @@ export default function FreezerScreen() {
             setFreeText={setFreeText}
           />
         </View>
-        <Pressable
-          style={[styles.additionIcon]}
-          onPress={() => addItemRef.current?.present()}
-        >
-          <AntDesign name='pluscircleo' size={48} color='black' />
-        </Pressable>
       </View>
     </Pressable>
   );

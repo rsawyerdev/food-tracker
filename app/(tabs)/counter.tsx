@@ -27,13 +27,13 @@ export default function CounterScreen() {
 
   useEffect(() => {
     if (!counterList) return;
-    if (counterList.length === 0) {
+    if (counterList.length === 1) {
       getData();
       return;
     }
   }, [counterList]);
 
-  const storeData = async (action: string, list: [Item]) => {
+  const storeData = async (action: string, list?: Item[]) => {
     if (action == 'add') {
       let lastID =
         counterList && counterList.length > 0 ? counterList.at(-1).id : 1;
@@ -47,7 +47,9 @@ export default function CounterScreen() {
       setFreeText('');
     }
     try {
-      const jsonValue = JSON.stringify(action == 'delete' ? list : counterList);
+      const jsonValue: string = JSON.stringify(
+        action == 'add' ? counterList : list
+      );
       await AsyncStorage.setItem('counter-key', jsonValue);
     } catch (e) {
       // saving error
@@ -57,6 +59,7 @@ export default function CounterScreen() {
   const getData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('counter-key');
+      if (jsonValue == null) return;
       setCounterList(JSON.parse(jsonValue));
       return jsonValue;
     } catch (e) {
@@ -75,7 +78,13 @@ export default function CounterScreen() {
   };
 
   return (
-    <Pressable style={styles.container} onPress={Keyboard.dismiss}>
+    <Pressable onPress={Keyboard.dismiss} style={styles.container}>
+      <Pressable
+        style={[styles.additionIcon]}
+        onPress={() => addItemRef.current?.present()}
+      >
+        <AntDesign name='pluscircleo' size={48} color='black' />
+      </Pressable>
       <View>
         <FlatList
           data={counterList}
@@ -97,12 +106,6 @@ export default function CounterScreen() {
             setFreeText={setFreeText}
           />
         </View>
-        <Pressable
-          style={[styles.additionIcon]}
-          onPress={() => addItemRef.current?.present()}
-        >
-          <AntDesign name='pluscircleo' size={48} color='black' />
-        </Pressable>
       </View>
     </Pressable>
   );

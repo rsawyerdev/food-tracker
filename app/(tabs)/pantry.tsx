@@ -5,7 +5,6 @@ import {
   Pressable,
   StyleSheet,
   View,
-  KeyboardAvoidingView,
 } from 'react-native';
 
 import ItemCard from '../../components/Item';
@@ -21,23 +20,25 @@ import AddItem from '@/components/AddItem';
 import { AntDesign } from '@expo/vector-icons';
 
 export default function PantryScreen() {
-  const [pantryList, setPantryList] = useState<Item[]>([]);
+  const [pantryList, setPantryList] = useState<Item[]>([firstItem]);
   const [freeText, setFreeText] = useState<string>('');
 
   const addItemRef = useRef<BottomSheetModal>(null);
-
   useEffect(() => {
-    if (pantryList.length === 0 || !pantryList) {
+    if (!pantryList) return;
+    if (pantryList.length === 1) {
       getData();
       return;
     }
   }, [pantryList]);
 
-  const storeData = async (action: string, list: [Item]) => {
+  const storeData = async (action: string, list?: Item[]) => {
     if (action == 'add') {
       let lastID =
         pantryList && pantryList.length > 0 ? pantryList.at(-1).id : 1;
+
       if (!freeText) return;
+
       const newListItem = {
         name: freeText,
         date: new Date().toString(),
@@ -47,7 +48,9 @@ export default function PantryScreen() {
       setFreeText('');
     }
     try {
-      const jsonValue = JSON.stringify(action == 'add' ? pantryList : list);
+      const jsonValue: string = JSON.stringify(
+        action == 'add' ? pantryList : list
+      );
       await AsyncStorage.setItem('pantry-key', jsonValue);
     } catch (e) {
       // saving error
@@ -57,6 +60,8 @@ export default function PantryScreen() {
   const getData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('pantry-key');
+      if (jsonValue == null) return;
+
       setPantryList(JSON.parse(jsonValue));
       return jsonValue;
     } catch (e) {
@@ -75,8 +80,14 @@ export default function PantryScreen() {
   };
 
   return (
-    <Pressable style={styles.container} onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView behavior='padding'>
+    <Pressable onPress={Keyboard.dismiss} style={styles.container}>
+      <Pressable
+        style={[styles.additionIcon]}
+        onPress={() => addItemRef.current?.present()}
+      >
+        <AntDesign name='pluscircleo' size={48} color='black' />
+      </Pressable>
+      <View>
         <FlatList
           data={pantryList}
           keyExtractor={(item, index) => `${item.id}`}
@@ -86,25 +97,18 @@ export default function PantryScreen() {
           <Button
             title='clear list'
             onPress={() => {
-              clearStorage('counter-key');
+              clearStorage('pantry-key');
             }}
           />
 
           <AddItem
             ref={addItemRef}
             storeData={storeData}
-            getData={getData}
             freeText={freeText}
             setFreeText={setFreeText}
           />
         </View>
-        <Pressable
-          style={[styles.additionIcon]}
-          onPress={() => addItemRef.current?.present()}
-        >
-          <AntDesign name='pluscircleo' size={48} color='black' />
-        </Pressable>
-      </KeyboardAvoidingView>
+      </View>
     </Pressable>
   );
 }
