@@ -18,10 +18,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { firstItem } from '@/constants/Utils';
+import { useStorage } from '@/api/context/storageState';
 
 export default function RefrigeratorScreen() {
-  const [refrigeratorList, setRefrigeratorList] = useState<Item[]>([firstItem]);
-  const [freeText, setFreeText] = useState<string>('');
+  const { setFreeText, freeText, refrigeratorList, storeRefrigeratorList } =
+    useStorage();
 
   const addItemRef = useRef<BottomSheetModal>(null);
   useEffect(() => {
@@ -49,21 +50,14 @@ export default function RefrigeratorScreen() {
       refrigeratorList.push(newListItem);
       setFreeText('');
     }
-    try {
-      const jsonValue: string = JSON.stringify(
-        action == 'add' ? refrigeratorList : list
-      );
-      await AsyncStorage.setItem('refrigerator-key', jsonValue);
-    } catch (e) {
-      // saving error
-    }
+    storeRefrigeratorList(refrigeratorList);
   };
 
   const getData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('refrigerator-key');
       if (jsonValue == null) return;
-      setRefrigeratorList(JSON.parse(jsonValue));
+      storeRefrigeratorList(JSON.parse(jsonValue));
       return jsonValue;
     } catch (e) {
       // error reading value
@@ -72,11 +66,12 @@ export default function RefrigeratorScreen() {
 
   const deleteItem = (item: Item, index: number) => {
     const newList = refrigeratorList.toSpliced(index, 1);
-    setRefrigeratorList(refrigeratorList.toSpliced(index, 1));
+    storeRefrigeratorList(refrigeratorList.toSpliced(index, 1));
     storeData('delete', newList);
   };
 
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
+    console.log('iotem', item);
     return <ItemCard item={item} deleteItem={deleteItem} index={index} />;
   };
 

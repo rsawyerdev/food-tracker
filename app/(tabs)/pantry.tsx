@@ -18,10 +18,10 @@ import { clearStorage } from '@/api/device/storage';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import AddItem from '@/components/AddItem';
 import { AntDesign } from '@expo/vector-icons';
+import { useStorage } from '@/api/context/storageState';
 
 export default function PantryScreen() {
-  const [pantryList, setPantryList] = useState<Item[]>([firstItem]);
-  const [freeText, setFreeText] = useState<string>('');
+  const { setFreeText, freeText, storePantryList, pantryList } = useStorage();
 
   const addItemRef = useRef<BottomSheetModal>(null);
   useEffect(() => {
@@ -47,14 +47,7 @@ export default function PantryScreen() {
       pantryList.push(newListItem);
       setFreeText('');
     }
-    try {
-      const jsonValue: string = JSON.stringify(
-        action == 'add' ? pantryList : list
-      );
-      await AsyncStorage.setItem('pantry-key', jsonValue);
-    } catch (e) {
-      // saving error
-    }
+    storePantryList(pantryList);
   };
 
   const getData = async () => {
@@ -62,7 +55,7 @@ export default function PantryScreen() {
       const jsonValue = await AsyncStorage.getItem('pantry-key');
       if (jsonValue == null) return;
 
-      setPantryList(JSON.parse(jsonValue));
+      storePantryList(JSON.parse(jsonValue));
       return jsonValue;
     } catch (e) {
       // error reading value
@@ -71,7 +64,7 @@ export default function PantryScreen() {
 
   const deleteItem = (item: Item, index: number) => {
     const newList = pantryList.toSpliced(index, 1);
-    setPantryList(newList);
+    storePantryList(newList);
     storeData('delete', newList);
   };
 

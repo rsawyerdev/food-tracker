@@ -17,10 +17,10 @@ import AddItem from '@/components/AddItem';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { firstItem } from '@/constants/Utils';
 import { AntDesign } from '@expo/vector-icons';
+import { useStorage } from '@/api/context/storageState';
 
 export default function FreezerScreen() {
-  const [freezerList, setFreezerList] = useState<Item[]>([firstItem]);
-  const [freeText, setFreeText] = useState<string>('');
+  const { storeFreezerList, freeText, setFreeText, freezerList } = useStorage();
 
   const addItemRef = useRef<BottomSheetModal>(null);
   useEffect(() => {
@@ -46,21 +46,15 @@ export default function FreezerScreen() {
       freezerList.push(newListItem);
       setFreeText('');
     }
-    try {
-      const jsonValue: string = JSON.stringify(
-        action == 'add' ? freezerList : list
-      );
-      await AsyncStorage.setItem('freezer-key', jsonValue);
-    } catch (e) {
-      // saving error
-    }
+
+    storeFreezerList(freezerList);
   };
 
   const getData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('freezer-key');
       if (jsonValue == null) return;
-      setFreezerList(JSON.parse(jsonValue));
+      storeFreezerList(JSON.parse(jsonValue));
       return jsonValue;
     } catch (e) {
       // error reading value
@@ -69,7 +63,7 @@ export default function FreezerScreen() {
 
   const deleteItem = (item: Item, index: number) => {
     const newList = freezerList.toSpliced(index, 1);
-    setFreezerList(newList);
+    storeFreezerList(newList);
     storeData('delete', newList);
   };
 

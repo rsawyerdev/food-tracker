@@ -18,10 +18,10 @@ import { clearStorage } from '@/api/device/storage';
 import AddItem from '@/components/AddItem';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { AntDesign } from '@expo/vector-icons';
+import { useStorage } from '@/api/context/storageState';
 
 export default function CounterScreen() {
-  const [counterList, setCounterList] = useState<Item[]>([firstItem]);
-  const [freeText, setFreeText] = useState<string>('');
+  const { storeCounterList, freeText, setFreeText, counterList } = useStorage();
 
   const addItemRef = useRef<BottomSheetModal>(null);
 
@@ -46,21 +46,14 @@ export default function CounterScreen() {
       counterList.push(newListItem);
       setFreeText('');
     }
-    try {
-      const jsonValue: string = JSON.stringify(
-        action == 'add' ? counterList : list
-      );
-      await AsyncStorage.setItem('counter-key', jsonValue);
-    } catch (e) {
-      // saving error
-    }
+    storeCounterList(counterList);
   };
 
   const getData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('counter-key');
       if (jsonValue == null) return;
-      setCounterList(JSON.parse(jsonValue));
+      storeCounterList(JSON.parse(jsonValue));
       return jsonValue;
     } catch (e) {
       // error reading value
@@ -69,7 +62,7 @@ export default function CounterScreen() {
 
   const deleteItem = (item: Item, index: number) => {
     const newList = counterList.toSpliced(index, 1);
-    setCounterList(newList);
+    storeCounterList(newList);
     storeData('delete', newList);
   };
 
