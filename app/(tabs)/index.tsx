@@ -12,73 +12,76 @@ import { useState, useEffect, useRef } from 'react';
 import { Item } from '@/types/types';
 import { clearStorage } from '../../api/device/storage';
 import AddItem from '@/components/AddItem';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { firstItem } from '@/constants/Utils';
+import { useStorage } from '@/api/context/storageState';
 
 export default function RefrigeratorScreen() {
-  const [refrigeratorList, setRefrigeratorList] = useState<Item[]>([]);
-  const [freeText, setFreeText] = useState<string>('');
+  const { setFreeText, freeText, refrigeratorList, storeRefrigeratorList } =
+    useStorage();
+  const [dataRetrieved, setDataRetrieved] = useState<boolean>(false);
 
   const addItemRef = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
-    if (refrigeratorList.length === 0 || !refrigeratorList) {
+    if (!refrigeratorList) return;
+    if (refrigeratorList.length === 1 && !dataRetrieved) {
       getData();
+      setDataRetrieved(true);
       return;
     }
   }, [refrigeratorList]);
 
-  const storeData = async (action: string, list?: [Item]) => {
-    if (action == 'add') {
-      let lastID =
-        refrigeratorList && refrigeratorList.length > 0
-          ? refrigeratorList.at(-1).id
-          : 1;
+  const storeData = async () => {
+    let lastID =
+      refrigeratorList && refrigeratorList.length > 0
+        ? refrigeratorList.at(-1).id
+        : 1;
 
-      if (!freeText) return;
+    if (!freeText) return;
 
-      const newListItem = {
-        name: freeText,
-        date: new Date().toString(),
-        id: lastID + 1,
-      };
-      refrigeratorList.push(newListItem);
-      setFreeText('');
-    }
-    try {
-      const jsonValue: string = JSON.stringify(
-        action == 'add' ? refrigeratorList : list
-      );
-      await AsyncStorage.setItem('refrigerator-key', jsonValue);
-    } catch (e) {
-      // saving error
-    }
+    const newListItem = {
+      name: freeText,
+      date: new Date().toString(),
+      id: lastID + 1,
+    };
+    refrigeratorList.push(newListItem);
+    setFreeText('');
+    storeRefrigeratorList(refrigeratorList, 'add');
   };
 
   const getData = async () => {
     try {
-      const jsonValue: string = await AsyncStorage.getItem('refrigerator-key');
-      setRefrigeratorList(JSON.parse(jsonValue));
+      const jsonValue = await AsyncStorage.getItem('refrigerator-key');
+      if (jsonValue == null) return;
+      storeRefrigeratorList(JSON.parse(jsonValue), 'add');
       return jsonValue;
     } catch (e) {
       // error reading value
     }
   };
 
-  const deleteItem = (item: Item, index: number) => {
+  const deleteItem = (index: number) => {
     const newList = refrigeratorList.toSpliced(index, 1);
-    setRefrigeratorList(refrigeratorList.toSpliced(index, 1));
-    storeData('delete', newList);
+    storeRefrigeratorList(newList, 'delete');
   };
 
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
-    return <ItemCard item={item} deleteItem={deleteItem} index={index} />;
+    return <ItemCard name={item.name} deleteItem={deleteItem} index={index} />;
   };
 
   return (
     <Pressable onPress={Keyboard.dismiss} style={styles.container}>
+      <Pressable
+        style={[styles.additionIcon]}
+        onPress={() => addItemRef.current?.present()}
+      >
+        <AntDesign name='pluscircleo' size={48} color='black' />
+      </Pressable>
       <View>
         <FlatList
           data={refrigeratorList}
@@ -92,10 +95,7 @@ export default function RefrigeratorScreen() {
               clearStorage('refrigerator-key');
             }}
           />
-          <Button
-            title='Add Item'
-            onPress={() => addItemRef.current?.present()}
-          />
+
           <AddItem
             ref={addItemRef}
             storeData={storeData}
@@ -123,5 +123,14 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     height: 1,
     width: '80%',
+  },
+  additionIcon: {
+    position: 'absolute',
+    left: 12,
+    bottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 0.5,
   },
 });

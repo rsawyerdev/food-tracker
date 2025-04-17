@@ -1,4 +1,11 @@
-import { Button, FlatList, Pressable, StyleSheet, View } from 'react-native';
+import {
+  Button,
+  FlatList,
+  Keyboard,
+  Pressable,
+  StyleSheet,
+  View,
+} from 'react-native';
 
 import ItemCard from '../../components/Item';
 import React, { useState, useEffect, useRef } from 'react';
@@ -8,18 +15,20 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { clearStorage } from '@/api/device/storage';
 import AddItem from '@/components/AddItem';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { firstItem } from '@/constants/Utils';
+import { AntDesign } from '@expo/vector-icons';
+import { useStorage } from '@/api/context/storageState';
 
 export default function FreezerScreen() {
-  const [freezerList, setFreezerList] = useState<Item[]>([firstItem]);
-  const [freeText, setFreeText] = useState<string>('');
+  const { storeFreezerList, freeText, setFreeText, freezerList } = useStorage();
+  const [dataRetrieved, setDataRetrieved] = useState<boolean>(false);
 
   const addItemRef = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
     if (!freezerList) return;
-    if (freezerList.length === 0) {
+    if (freezerList.length === 1 && !dataRetrieved) {
       getData();
+      setDataRetrieved(true);
       return;
     }
   }, [freezerList]);
@@ -38,30 +47,37 @@ export default function FreezerScreen() {
     freezerList.push(newListItem);
     setFreeText('');
 
-    try {
-      const jsonValue = JSON.stringify(freezerList);
-      await AsyncStorage.setItem('freezer-key', jsonValue);
-    } catch (e) {
-      // saving error
-    }
+    storeFreezerList(freezerList, 'add');
   };
 
   const getData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('freezer-key');
-      setFreezerList(JSON.parse(jsonValue));
+      if (jsonValue == null) return;
+      storeFreezerList(JSON.parse(jsonValue), 'add');
       return jsonValue;
     } catch (e) {
       // error reading value
     }
   };
 
+  const deleteItem = (index: number) => {
+    const newList = freezerList.toSpliced(index, 1);
+    storeFreezerList(newList, 'delete');
+  };
+
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
-    return <ItemCard item={item} />;
+    return <ItemCard name={item.name} deleteItem={deleteItem} index={index} />;
   };
 
   return (
-    <Pressable style={styles.container}>
+    <Pressable onPress={Keyboard.dismiss} style={styles.container}>
+      <Pressable
+        style={[styles.additionIcon]}
+        onPress={() => addItemRef.current?.present()}
+      >
+        <AntDesign name='pluscircleo' size={48} color='black' />
+      </Pressable>
       <View>
         <FlatList
           data={freezerList}
@@ -75,10 +91,7 @@ export default function FreezerScreen() {
               clearStorage('freezer-key');
             }}
           />
-          <Button
-            title='Add Item'
-            onPress={() => addItemRef.current?.present()}
-          />
+
           <AddItem
             ref={addItemRef}
             storeData={storeData}
@@ -106,5 +119,14 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     height: 1,
     width: '80%',
+  },
+  additionIcon: {
+    position: 'absolute',
+    left: 12,
+    bottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 0.5,
   },
 });

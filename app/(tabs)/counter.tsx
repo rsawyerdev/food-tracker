@@ -17,17 +17,20 @@ import React from 'react';
 import { clearStorage } from '@/api/device/storage';
 import AddItem from '@/components/AddItem';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { AntDesign } from '@expo/vector-icons';
+import { useStorage } from '@/api/context/storageState';
 
 export default function CounterScreen() {
-  const [counterList, setCounterList] = useState<Item[]>([firstItem]);
-  const [freeText, setFreeText] = useState<string>('');
+  const { storeCounterList, freeText, setFreeText, counterList } = useStorage();
+  const [dataRetrieved, setDataRetrieved] = useState<boolean>(false);
 
   const addItemRef = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
     if (!counterList) return;
-    if (counterList.length === 0) {
+    if (counterList.length === 1 && !dataRetrieved) {
       getData();
+      setDataRetrieved(true);
       return;
     }
   }, [counterList]);
@@ -44,30 +47,37 @@ export default function CounterScreen() {
     counterList.push(newListItem);
     setFreeText('');
 
-    try {
-      const jsonValue = JSON.stringify(counterList);
-      await AsyncStorage.setItem('counter-key', jsonValue);
-    } catch (e) {
-      // saving error
-    }
+    storeCounterList(counterList, 'add');
   };
 
   const getData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('counter-key');
-      setCounterList(JSON.parse(jsonValue));
+      if (jsonValue == null) return;
+      storeCounterList(JSON.parse(jsonValue), 'add');
       return jsonValue;
     } catch (e) {
       // error reading value
     }
   };
 
+  const deleteItem = (index: number) => {
+    const newList = counterList.toSpliced(index, 1);
+    storeCounterList(newList, 'delete');
+  };
+
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
-    return <ItemCard item={item} />;
+    return <ItemCard name={item.name} deleteItem={deleteItem} index={index} />;
   };
 
   return (
-    <Pressable style={styles.container} onPress={Keyboard.dismiss}>
+    <Pressable onPress={Keyboard.dismiss} style={styles.container}>
+      <Pressable
+        style={[styles.additionIcon]}
+        onPress={() => addItemRef.current?.present()}
+      >
+        <AntDesign name='pluscircleo' size={48} color='black' />
+      </Pressable>
       <View>
         <FlatList
           data={counterList}
@@ -81,10 +91,7 @@ export default function CounterScreen() {
               clearStorage('counter-key');
             }}
           />
-          <Button
-            title='Add Item'
-            onPress={() => addItemRef.current?.present()}
-          />
+
           <AddItem
             ref={addItemRef}
             storeData={storeData}
@@ -112,5 +119,14 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     height: 1,
     width: '80%',
+  },
+  additionIcon: {
+    position: 'absolute',
+    left: 12,
+    bottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 0.5,
   },
 });

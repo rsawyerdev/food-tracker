@@ -5,7 +5,6 @@ import {
   Pressable,
   StyleSheet,
   View,
-  KeyboardAvoidingView,
 } from 'react-native';
 
 import ItemCard from '../../components/Item';
@@ -18,23 +17,30 @@ import React from 'react';
 import { clearStorage } from '@/api/device/storage';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import AddItem from '@/components/AddItem';
+import { AntDesign } from '@expo/vector-icons';
+import { useStorage } from '@/api/context/storageState';
 
 export default function PantryScreen() {
-  const [pantryList, setPantryList] = useState<Item[]>([]);
-  const [freeText, setFreeText] = useState<string>('');
+  const { setFreeText, freeText, storePantryList, pantryList } = useStorage();
+  const [dataRetrieved, setDataRetrieved] = useState<boolean>(false);
 
   const addItemRef = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
-    if (pantryList.length === 0 || !pantryList) {
+    if (!pantryList) return;
+
+    if (pantryList.length === 1 && !dataRetrieved) {
       getData();
+      setDataRetrieved(true);
       return;
     }
   }, [pantryList]);
 
   const storeData = async () => {
     let lastID = pantryList && pantryList.length > 0 ? pantryList.at(-1).id : 1;
+
     if (!freeText) return;
+
     const newListItem = {
       name: freeText,
       date: new Date().toString(),
@@ -43,31 +49,39 @@ export default function PantryScreen() {
     pantryList.push(newListItem);
     setFreeText('');
 
-    try {
-      const jsonValue = JSON.stringify(pantryList);
-      await AsyncStorage.setItem('pantry-key', jsonValue);
-    } catch (e) {
-      // saving error
-    }
+    storePantryList(pantryList, 'add');
   };
 
   const getData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('pantry-key');
-      setPantryList(JSON.parse(jsonValue));
+      if (jsonValue == null) return;
+
+      storePantryList(JSON.parse(jsonValue), 'add');
       return jsonValue;
     } catch (e) {
       // error reading value
     }
   };
 
+  const deleteItem = (index: number) => {
+    const newList = pantryList.toSpliced(index, 1);
+    storePantryList(newList, 'delete');
+  };
+
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
-    return <ItemCard item={item} />;
+    return <ItemCard name={item.name} deleteItem={deleteItem} index={index} />;
   };
 
   return (
-    <Pressable style={styles.container} onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView behavior='padding'>
+    <Pressable onPress={Keyboard.dismiss} style={styles.container}>
+      <Pressable
+        style={[styles.additionIcon]}
+        onPress={() => addItemRef.current?.present()}
+      >
+        <AntDesign name='pluscircleo' size={48} color='black' />
+      </Pressable>
+      <View>
         <FlatList
           data={pantryList}
           keyExtractor={(item, index) => `${item.id}`}
@@ -77,22 +91,18 @@ export default function PantryScreen() {
           <Button
             title='clear list'
             onPress={() => {
-              clearStorage('counter-key');
+              clearStorage('pantry-key');
             }}
           />
-          <Button
-            title='Add Item'
-            onPress={() => addItemRef.current?.present()}
-          />
+
           <AddItem
             ref={addItemRef}
             storeData={storeData}
-            getData={getData}
             freeText={freeText}
             setFreeText={setFreeText}
           />
         </View>
-      </KeyboardAvoidingView>
+      </View>
     </Pressable>
   );
 }
@@ -112,5 +122,14 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     height: 1,
     width: '80%',
+  },
+  additionIcon: {
+    position: 'absolute',
+    left: 12,
+    bottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 0.5,
   },
 });
