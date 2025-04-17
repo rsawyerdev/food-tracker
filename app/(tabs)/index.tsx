@@ -23,56 +23,55 @@ import { useStorage } from '@/api/context/storageState';
 export default function RefrigeratorScreen() {
   const { setFreeText, freeText, refrigeratorList, storeRefrigeratorList } =
     useStorage();
+  const [dataRetrieved, setDataRetrieved] = useState<boolean>(false);
 
   const addItemRef = useRef<BottomSheetModal>(null);
+
   useEffect(() => {
     if (!refrigeratorList) return;
-    if (refrigeratorList.length === 1) {
+    if (refrigeratorList.length === 1 && !dataRetrieved) {
       getData();
+      setDataRetrieved(true);
       return;
     }
   }, [refrigeratorList]);
 
-  const storeData = async (action: string, list?: Item[]) => {
-    if (action == 'add') {
-      let lastID =
-        refrigeratorList && refrigeratorList.length > 0
-          ? refrigeratorList.at(-1).id
-          : 1;
+  const storeData = async () => {
+    let lastID =
+      refrigeratorList && refrigeratorList.length > 0
+        ? refrigeratorList.at(-1).id
+        : 1;
 
-      if (!freeText) return;
+    if (!freeText) return;
 
-      const newListItem = {
-        name: freeText,
-        date: new Date().toString(),
-        id: lastID + 1,
-      };
-      refrigeratorList.push(newListItem);
-      setFreeText('');
-    }
-    storeRefrigeratorList(refrigeratorList);
+    const newListItem = {
+      name: freeText,
+      date: new Date().toString(),
+      id: lastID + 1,
+    };
+    refrigeratorList.push(newListItem);
+    setFreeText('');
+    storeRefrigeratorList(refrigeratorList, 'add');
   };
 
   const getData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('refrigerator-key');
       if (jsonValue == null) return;
-      storeRefrigeratorList(JSON.parse(jsonValue));
+      storeRefrigeratorList(JSON.parse(jsonValue), 'add');
       return jsonValue;
     } catch (e) {
       // error reading value
     }
   };
 
-  const deleteItem = (item: Item, index: number) => {
+  const deleteItem = (index: number) => {
     const newList = refrigeratorList.toSpliced(index, 1);
-    storeRefrigeratorList(refrigeratorList.toSpliced(index, 1));
-    storeData('delete', newList);
+    storeRefrigeratorList(newList, 'delete');
   };
 
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
-    console.log('iotem', item);
-    return <ItemCard item={item} deleteItem={deleteItem} index={index} />;
+    return <ItemCard name={item.name} deleteItem={deleteItem} index={index} />;
   };
 
   return (

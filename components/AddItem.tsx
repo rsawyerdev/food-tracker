@@ -79,7 +79,7 @@ export default React.forwardRef(function (props, ref) {
           <View>
             <Button
               title='enter'
-              onPress={() => storeData('add')}
+              onPress={storeData}
               disabled={!freeText}
               color='blue'
             />

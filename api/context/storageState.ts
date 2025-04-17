@@ -16,10 +16,10 @@ type StorageState = {
 type Actions = {
   reset: () => void;
   setFreeText: (text: string) => void;
-  storePantryList: (newList: Item[]) => void;
-  storeCounterList: (newList: Item[]) => void;
-  storeFreezerList: (newList: Item[]) => void;
-  storeRefrigeratorList: (newList: Item[]) => void;
+  storePantryList: (newList: Item[], action: string) => void;
+  storeCounterList: (newList: Item[], action: string) => void;
+  storeFreezerList: (newList: Item[], action: string) => void;
+  storeRefrigeratorList: (newList: Item[], action: string) => void;
 };
 
 // define the initial state
@@ -37,7 +37,7 @@ export const useStorage = create<StorageState & Actions>()((set, get) => ({
   setFreeText: (text: string) => {
     set({ freeText: text });
   },
-  storePantryList: async (newList: Item[]) => {
+  storePantryList: async (newList: Item[], action: string) => {
     let newPantryList;
     newPantryList = set({ pantryList: get().pantryList });
     if (newPantryList == undefined) {
@@ -47,13 +47,15 @@ export const useStorage = create<StorageState & Actions>()((set, get) => ({
     }
     set({ pantryList: newPantryList });
     try {
-      const jsonValue = JSON.stringify(newPantryList);
+      const jsonValue = JSON.stringify(
+        action === 'delete' ? newList : newPantryList
+      );
       await AsyncStorage.setItem('pantry-key', jsonValue);
     } catch (e) {
       // saving error
     }
   },
-  storeCounterList: async (newList: Item[]) => {
+  storeCounterList: async (newList: Item[], action: string) => {
     let newCounterList;
     newCounterList = set({ counterList: get().counterList });
     if (newCounterList == undefined) {
@@ -63,13 +65,15 @@ export const useStorage = create<StorageState & Actions>()((set, get) => ({
     }
     set({ counterList: newCounterList });
     try {
-      const jsonValue = JSON.stringify(newCounterList);
+      const jsonValue = JSON.stringify(
+        action === 'delete' ? newList : newCounterList
+      );
       await AsyncStorage.setItem('counter-key', jsonValue);
     } catch (e) {
       // saving error
     }
   },
-  storeFreezerList: async (newList: Item[]) => {
+  storeFreezerList: async (newList: Item[], action: string) => {
     let newFreezerList;
     newFreezerList = set({ freezerList: get().freezerList });
     if (newFreezerList == undefined) {
@@ -79,13 +83,15 @@ export const useStorage = create<StorageState & Actions>()((set, get) => ({
     }
     set({ freezerList: newFreezerList });
     try {
-      const jsonValue = JSON.stringify(newFreezerList);
+      const jsonValue = JSON.stringify(
+        action === 'delete' ? newList : newFreezerList
+      );
       await AsyncStorage.setItem('freezer-key', jsonValue);
     } catch (e) {
       // saving error
     }
   },
-  storeRefrigeratorList: async (newList: Item[]) => {
+  storeRefrigeratorList: async (newList: Item[], action: string) => {
     let newRefrigeratorList;
     newRefrigeratorList = set({ refrigeratorList: get().refrigeratorList });
     if (newRefrigeratorList == undefined) {
@@ -95,7 +101,9 @@ export const useStorage = create<StorageState & Actions>()((set, get) => ({
     }
     set({ refrigeratorList: newRefrigeratorList });
     try {
-      const jsonValue = JSON.stringify(newRefrigeratorList);
+      const jsonValue = JSON.stringify(
+        action === 'delete' ? newList : newRefrigeratorList
+      );
       await AsyncStorage.setItem('refrigerator-key', jsonValue);
     } catch (e) {
       // saving error

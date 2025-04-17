@@ -22,32 +22,34 @@ import { useStorage } from '@/api/context/storageState';
 
 export default function PantryScreen() {
   const { setFreeText, freeText, storePantryList, pantryList } = useStorage();
+  const [dataRetrieved, setDataRetrieved] = useState<boolean>(false);
 
   const addItemRef = useRef<BottomSheetModal>(null);
+
   useEffect(() => {
     if (!pantryList) return;
-    if (pantryList.length === 1) {
+
+    if (pantryList.length === 1 && !dataRetrieved) {
       getData();
+      setDataRetrieved(true);
       return;
     }
   }, [pantryList]);
 
-  const storeData = async (action: string, list?: Item[]) => {
-    if (action == 'add') {
-      let lastID =
-        pantryList && pantryList.length > 0 ? pantryList.at(-1).id : 1;
+  const storeData = async () => {
+    let lastID = pantryList && pantryList.length > 0 ? pantryList.at(-1).id : 1;
 
-      if (!freeText) return;
+    if (!freeText) return;
 
-      const newListItem = {
-        name: freeText,
-        date: new Date().toString(),
-        id: lastID + 1,
-      };
-      pantryList.push(newListItem);
-      setFreeText('');
-    }
-    storePantryList(pantryList);
+    const newListItem = {
+      name: freeText,
+      date: new Date().toString(),
+      id: lastID + 1,
+    };
+    pantryList.push(newListItem);
+    setFreeText('');
+
+    storePantryList(pantryList, 'add');
   };
 
   const getData = async () => {
@@ -55,21 +57,20 @@ export default function PantryScreen() {
       const jsonValue = await AsyncStorage.getItem('pantry-key');
       if (jsonValue == null) return;
 
-      storePantryList(JSON.parse(jsonValue));
+      storePantryList(JSON.parse(jsonValue), 'add');
       return jsonValue;
     } catch (e) {
       // error reading value
     }
   };
 
-  const deleteItem = (item: Item, index: number) => {
+  const deleteItem = (index: number) => {
     const newList = pantryList.toSpliced(index, 1);
-    storePantryList(newList);
-    storeData('delete', newList);
+    storePantryList(newList, 'delete');
   };
 
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
-    return <ItemCard item={item} deleteItem={deleteItem} index={index} />;
+    return <ItemCard name={item.name} deleteItem={deleteItem} index={index} />;
   };
 
   return (

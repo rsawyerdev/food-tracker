@@ -17,8 +17,7 @@ export default function ItemCard(props: any) {
   const [show, setShow] = useState(false);
   const web = Platform.OS == 'web';
 
-  const { deleteItem, containerStyle, item, index } = props;
-
+  const { containerStyle, index, deleteItem, name } = props;
   const { width } = useWindowDimensions();
 
   const onChange = (event: any, selectedDate: any) => {
@@ -50,7 +49,7 @@ export default function ItemCard(props: any) {
           borderRadius: 10,
         }}
       >
-        <TextInput placeholder='Product Name' value={item.name} />
+        <TextInput placeholder='Product Name' value={name} />
         {/* <Button onPress={showTimepicker} title="Show time picker!" /> */}
         <Pressable onPress={() => setShow(true)}>
           <Text>Added: {date.toDateString()}</Text>
@@ -69,7 +68,7 @@ export default function ItemCard(props: any) {
         <Button
           title='Delete'
           color={web ? 'red' : 'white'}
-          onPress={() => deleteItem(item, index)}
+          onPress={() => deleteItem(index)}
         />
       </View>
     </View>

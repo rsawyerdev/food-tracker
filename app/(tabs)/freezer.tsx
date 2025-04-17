@@ -15,60 +15,59 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { clearStorage } from '@/api/device/storage';
 import AddItem from '@/components/AddItem';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { firstItem } from '@/constants/Utils';
 import { AntDesign } from '@expo/vector-icons';
 import { useStorage } from '@/api/context/storageState';
 
 export default function FreezerScreen() {
   const { storeFreezerList, freeText, setFreeText, freezerList } = useStorage();
+  const [dataRetrieved, setDataRetrieved] = useState<boolean>(false);
 
   const addItemRef = useRef<BottomSheetModal>(null);
+
   useEffect(() => {
     if (!freezerList) return;
-    if (freezerList.length === 1) {
+    if (freezerList.length === 1 && !dataRetrieved) {
       getData();
+      setDataRetrieved(true);
       return;
     }
   }, [freezerList]);
 
-  const storeData = async (action: string, list?: Item[]) => {
-    if (action == 'add') {
-      let lastID =
-        freezerList && freezerList.length > 0 ? freezerList.at(-1).id : 1;
+  const storeData = async () => {
+    let lastID =
+      freezerList && freezerList.length > 0 ? freezerList.at(-1).id : 1;
 
-      if (!freeText) return;
+    if (!freeText) return;
 
-      const newListItem = {
-        name: freeText,
-        date: new Date().toString(),
-        id: lastID + 1,
-      };
-      freezerList.push(newListItem);
-      setFreeText('');
-    }
+    const newListItem = {
+      name: freeText,
+      date: new Date().toString(),
+      id: lastID + 1,
+    };
+    freezerList.push(newListItem);
+    setFreeText('');
 
-    storeFreezerList(freezerList);
+    storeFreezerList(freezerList, 'add');
   };
 
   const getData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('freezer-key');
       if (jsonValue == null) return;
-      storeFreezerList(JSON.parse(jsonValue));
+      storeFreezerList(JSON.parse(jsonValue), 'add');
       return jsonValue;
     } catch (e) {
       // error reading value
     }
   };
 
-  const deleteItem = (item: Item, index: number) => {
+  const deleteItem = (index: number) => {
     const newList = freezerList.toSpliced(index, 1);
-    storeFreezerList(newList);
-    storeData('delete', newList);
+    storeFreezerList(newList, 'delete');
   };
 
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
-    return <ItemCard item={item} deleteItem={deleteItem} index={index} />;
+    return <ItemCard name={item.name} deleteItem={deleteItem} index={index} />;
   };
 
   return (
