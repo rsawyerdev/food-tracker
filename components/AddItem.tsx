@@ -1,15 +1,18 @@
+import { suggestions } from '@/constants/Utils';
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import { Autocomplete, TextField } from '@mui/material';
-import React, { useCallback } from 'react';
-import { Button, KeyboardAvoidingView, StyleSheet } from 'react-native';
+import React, { useCallback, useRef, useState } from 'react';
+import { Button, FlatList, StyleSheet, View, Text } from 'react-native';
+import { Pressable } from 'react-native-gesture-handler';
 
 export default React.forwardRef(function (props, ref) {
-  const { storeData, freeText, setFreeText } = props;
+  const { freeText, setFreeText, dismiss } = props;
+  const [loading, setLoading] = useState(false);
+  const [suggestionsList, setSuggestionsList] = useState(null);
 
   const renderBackdrop = useCallback(
     (props: any) => (
@@ -24,24 +27,26 @@ export default React.forwardRef(function (props, ref) {
     []
   );
 
-  const handleSnap = [160];
+  const handleSnap = [300];
 
-  const suggestions = [
-    'salt',
-    'pepper',
-    'olive oil',
-    'bread',
-    'milk',
-    'eggs',
-    'chicken breast',
-    'whole chicken',
-    'carrots',
-    'apples',
-    'lemons',
-    'blueberries',
-    'yogurt',
-    'salmon',
-  ];
+  const getSuggestions = useCallback(async (q) => {
+    const filterToken = q.toLowerCase();
+    setFreeText(filterToken);
+
+    if (typeof q !== 'string' || q.length < 1) {
+      setSuggestionsList(null);
+      return;
+    }
+    setLoading(true);
+    const suggestionList = suggestions
+      .filter((item) => item.title.toLowerCase().includes(filterToken))
+      .map((item) => ({
+        id: item.id,
+        title: item.title,
+      }));
+    setSuggestionsList(suggestionList);
+    setLoading(false);
+  }, []);
 
   return (
     <BottomSheetModal
@@ -49,25 +54,43 @@ export default React.forwardRef(function (props, ref) {
       snapPoints={handleSnap}
       backdropComponent={renderBackdrop}
     >
-      <BottomSheetView>
-        <KeyboardAvoidingView style={styles.textContainer} behavior='padding'>
-          <Autocomplete
-            disablePortal
-            freeSolo
-            options={suggestions}
-            onChange={(event, newValue) => setFreeText(newValue)}
-            sx={{ width: 300 }}
-            renderInput={(params) => (
-              <TextField {...params} label='Food item' />
-            )}
-            onKeyDown={(press) => press.key == 'Enter' && storeData()}
+      <BottomSheetView
+        style={{
+          flex: 1,
+          height: 300,
+          justifyContent: 'space-around',
+          alignItems: 'center',
+        }}
+      >
+        <View style={styles.textContainer}>
+          <BottomSheetTextInput
+            style={[styles.textInput]}
+            placeholder={freeText}
+            value={freeText}
+            onChangeText={setFreeText && getSuggestions}
+            enablesReturnKeyAutomatically
+            // onSubmitEditing={() => setFreeText('')}
+            clearTextOnFocus
           />
-          <Button
-            title='enter'
-            onPress={() => storeData('add')}
-            disabled={!freeText}
-          />
-        </KeyboardAvoidingView>
+          <View>
+            <Button
+              title='enter'
+              onPress={dismiss}
+              disabled={!freeText}
+              color='blue'
+            />
+          </View>
+        </View>
+        <FlatList
+          data={suggestionsList}
+          renderItem={(suggestion) => (
+            <View>
+              <Pressable onPress={() => setFreeText(suggestion.item.title)}>
+                <Text style={[styles.itemText]}>{suggestion.item.title}</Text>
+              </Pressable>
+            </View>
+          )}
+        />
       </BottomSheetView>
     </BottomSheetModal>
   );
@@ -77,14 +100,18 @@ const styles = StyleSheet.create({
   container: {},
   textInput: {
     height: 50,
-    width: 100,
-    backgroundColor: 'pink',
+    width: 150,
+    fontSize: 18,
     marginBottom: 12,
     paddingLeft: 8,
+    backgroundColor: 'lightblue',
   },
   textContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    height: 160,
+  },
+  itemText: {
+    paddingVertical: 5,
+    fontSize: 18,
   },
 });

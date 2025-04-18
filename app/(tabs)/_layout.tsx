@@ -14,13 +14,13 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: true,
+        headerShown: false,
       }}
     >
       <Tabs.Screen
         name='index'
         options={{
-          title: 'Refrigerator',
+          title: 'Kitchen',
           tabBarIcon: () => (
             <MaterialCommunityIcons
               name='fridge-bottom'
@@ -30,41 +30,7 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name='freezer'
-        options={{
-          title: 'Freezer',
-          tabBarIcon: () => (
-            <MaterialCommunityIcons name='fridge-top' size={24} color='black' />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name='pantry'
-        options={{
-          title: 'Pantry',
-          tabBarIcon: () => (
-            <MaterialCommunityIcons
-              name='bread-slice-outline'
-              size={24}
-              color='black'
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name='counter'
-        options={{
-          title: 'Counter',
-          tabBarIcon: () => (
-            <MaterialCommunityIcons
-              name='store-marker'
-              size={24}
-              color='black'
-            />
-          ),
-        }}
-      />
+
       <Tabs.Screen
         name='recipes'
         options={{
@@ -72,6 +38,12 @@ export default function TabLayout() {
           tabBarIcon: () => (
             <FontAwesome name='list-alt' size={24} color='black' />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name='locations'
+        options={{
+          href: null,
         }}
       />
     </Tabs>
