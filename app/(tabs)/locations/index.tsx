@@ -17,7 +17,7 @@ import React from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useStorage } from '@/api/context/storageState';
 import AddExpiration from '@/components/AddExpiration';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 
 export default function RefrigeratorScreen() {
   const { location } = useLocalSearchParams();
@@ -117,6 +117,9 @@ export default function RefrigeratorScreen() {
       >
         <AntDesign name='pluscircleo' size={48} color='black' />
       </Pressable>
+      <Pressable onPress={() => router.back()} style={styles.backButton}>
+        <AntDesign name='arrowleft' size={30} color='black' />
+      </Pressable>
       <View>
         <FlatList
           data={list}
@@ -157,6 +160,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 24,
+    marginTop: 40,
+  },
+  backButton: {
+    alignSelf: 'flex-start',
+    paddingLeft: 10,
   },
   title: {
     fontSize: 20,
