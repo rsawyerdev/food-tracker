@@ -9,35 +9,13 @@ import {
   Platform,
 } from 'react-native';
 import React, { useState } from 'react';
-import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function ItemCard(props: any) {
-  const [date, setDate] = useState(new Date(Date.now()));
   const [mode, setMode] = useState('date');
-  const [show, setShow] = useState(false);
   const web = Platform.OS == 'web';
 
-  const { containerStyle, index, deleteItem, name } = props;
+  const { containerStyle, index, deleteItem, name, date } = props;
   const { width } = useWindowDimensions();
-
-  const onChange = (event: any, selectedDate: any) => {
-    const currentDate = selectedDate;
-    setShow(false);
-    setDate(currentDate);
-  };
-
-  const showMode = (currentMode: string) => {
-    setShow(true);
-    setMode(currentMode);
-  };
-
-  const showDatepicker = () => {
-    showMode('date');
-  };
-
-  const showTimepicker = () => {
-    showMode('time');
-  };
 
   return (
     <View style={[styles.container, containerStyle, { width: width }]}>
@@ -49,20 +27,8 @@ export default function ItemCard(props: any) {
           borderRadius: 10,
         }}
       >
-        <TextInput placeholder='Product Name' value={name} />
-        {/* <Button onPress={showTimepicker} title="Show time picker!" /> */}
-        <Pressable onPress={() => setShow(true)}>
-          <Text>Added: {date.toDateString()}</Text>
-        </Pressable>
-        {show && (
-          <DateTimePicker
-            testID='dateTimePicker'
-            value={date}
-            mode={'date'}
-            is24Hour={true}
-            onChange={onChange}
-          />
-        )}
+        <Text>{name}</Text>
+        <Text>Expires:{date}</Text>
       </View>
       <View style={styles.deleteButton}>
         <Button

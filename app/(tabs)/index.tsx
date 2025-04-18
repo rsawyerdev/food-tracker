@@ -19,6 +19,7 @@ import React from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { firstItem } from '@/constants/Utils';
 import { useStorage } from '@/api/context/storageState';
+import AddExpiration from '@/components/AddExpiration';
 
 export default function RefrigeratorScreen() {
   const { setFreeText, freeText, refrigeratorList, storeRefrigeratorList } =
@@ -26,6 +27,7 @@ export default function RefrigeratorScreen() {
   const [dataRetrieved, setDataRetrieved] = useState<boolean>(false);
 
   const addItemRef = useRef<BottomSheetModal>(null);
+  const addAdditionalRef = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
     if (!refrigeratorList) return;
@@ -36,7 +38,7 @@ export default function RefrigeratorScreen() {
     }
   }, [refrigeratorList]);
 
-  const storeData = async () => {
+  const storeData = async (date: Date) => {
     let lastID =
       refrigeratorList && refrigeratorList.length > 0
         ? refrigeratorList.at(-1).id
@@ -71,7 +73,14 @@ export default function RefrigeratorScreen() {
   };
 
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
-    return <ItemCard name={item.name} deleteItem={deleteItem} index={index} />;
+    return (
+      <ItemCard
+        name={item.name}
+        deleteItem={deleteItem}
+        index={index}
+        date={item.date}
+      />
+    );
   };
 
   return (
@@ -89,18 +98,26 @@ export default function RefrigeratorScreen() {
           renderItem={_renderItem}
         />
         <View style={{ height: 100, justifyContent: 'space-around' }}>
-          <Button
+          {/* <Button
             title='clear list'
             onPress={() => {
               clearStorage('refrigerator-key');
             }}
-          />
+          /> */}
 
           <AddItem
             ref={addItemRef}
-            storeData={storeData}
             freeText={freeText}
             setFreeText={setFreeText}
+            dismiss={() => {
+              addItemRef.current?.dismiss();
+              addAdditionalRef.current?.present();
+            }}
+          />
+          <AddExpiration
+            ref={addAdditionalRef}
+            freeText={freeText}
+            storeData={storeData}
           />
         </View>
       </View>

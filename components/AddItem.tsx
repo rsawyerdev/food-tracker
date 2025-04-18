@@ -10,7 +10,7 @@ import { Button, FlatList, StyleSheet, View, Text } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
 
 export default React.forwardRef(function (props, ref) {
-  const { storeData, freeText, setFreeText } = props;
+  const { freeText, setFreeText, dismiss } = props;
   const [loading, setLoading] = useState(false);
   const [suggestionsList, setSuggestionsList] = useState(null);
 
@@ -48,10 +48,6 @@ export default React.forwardRef(function (props, ref) {
     setLoading(false);
   }, []);
 
-  const onClearPress = useCallback(() => {
-    setSuggestionsList(null);
-  }, []);
-
   return (
     <BottomSheetModal
       ref={ref}
@@ -73,13 +69,13 @@ export default React.forwardRef(function (props, ref) {
             value={freeText}
             onChangeText={setFreeText && getSuggestions}
             enablesReturnKeyAutomatically
-            onSubmitEditing={() => setFreeText('')}
+            // onSubmitEditing={() => setFreeText('')}
             clearTextOnFocus
           />
           <View>
             <Button
               title='enter'
-              onPress={storeData}
+              onPress={dismiss}
               disabled={!freeText}
               color='blue'
             />
