@@ -1,153 +1,74 @@
-import {
-  Button,
-  FlatList,
-  Keyboard,
-  Pressable,
-  StyleSheet,
-  View,
-} from 'react-native';
-
-import ItemCard from '../../components/Item';
-import { useState, useEffect, useRef } from 'react';
-import { Item } from '@/types/types';
-import { clearStorage } from '../../api/device/storage';
-import AddItem from '@/components/AddItem';
-import AntDesign from '@expo/vector-icons/AntDesign';
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { firstItem } from '@/constants/Utils';
-import { useStorage } from '@/api/context/storageState';
-import AddExpiration from '@/components/AddExpiration';
+import { router } from 'expo-router';
 
-export default function RefrigeratorScreen() {
-  const { setFreeText, freeText, refrigeratorList, storeRefrigeratorList } =
-    useStorage();
-  const [dataRetrieved, setDataRetrieved] = useState<boolean>(false);
-
-  const addItemRef = useRef<BottomSheetModal>(null);
-  const addAdditionalRef = useRef<BottomSheetModal>(null);
-
-  useEffect(() => {
-    if (!refrigeratorList) return;
-    if (refrigeratorList.length === 1 && !dataRetrieved) {
-      getData();
-      setDataRetrieved(true);
-      return;
-    }
-  }, [refrigeratorList]);
-
-  const storeData = async (date: Date) => {
-    let lastID =
-      refrigeratorList && refrigeratorList.length > 0
-        ? refrigeratorList.at(-1).id
-        : 1;
-
-    if (!freeText) return;
-
-    const newListItem = {
-      name: freeText,
-      date: new Date().toString(),
-      id: lastID + 1,
-    };
-    refrigeratorList.push(newListItem);
-    setFreeText('');
-    storeRefrigeratorList(refrigeratorList, 'add');
-  };
-
-  const getData = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem('refrigerator-key');
-      if (jsonValue == null) return;
-      storeRefrigeratorList(JSON.parse(jsonValue), 'add');
-      return jsonValue;
-    } catch (e) {
-      // error reading value
-    }
-  };
-
-  const deleteItem = (index: number) => {
-    const newList = refrigeratorList.toSpliced(index, 1);
-    storeRefrigeratorList(newList, 'delete');
-  };
-
-  const _renderItem = ({ item, index }: { item: any; index: number }) => {
-    return (
-      <ItemCard
-        name={item.name}
-        deleteItem={deleteItem}
-        index={index}
-        date={item.date}
-      />
-    );
-  };
-
+export default function Kitchen() {
   return (
-    <Pressable onPress={Keyboard.dismiss} style={styles.container}>
-      <Pressable
-        style={[styles.additionIcon]}
-        onPress={() => addItemRef.current?.present()}
-      >
-        <AntDesign name='pluscircleo' size={48} color='black' />
-      </Pressable>
-      <View>
-        <FlatList
-          data={refrigeratorList}
-          keyExtractor={(item, index) => `${item.id}`}
-          renderItem={_renderItem}
-        />
-        <View style={{ height: 100, justifyContent: 'space-around' }}>
-          {/* <Button
-            title='clear list'
-            onPress={() => {
-              clearStorage('refrigerator-key');
-            }}
-          /> */}
-
-          <AddItem
-            ref={addItemRef}
-            freeText={freeText}
-            setFreeText={setFreeText}
-            dismiss={() => {
-              addItemRef.current?.dismiss();
-              addAdditionalRef.current?.present();
-            }}
-          />
-          <AddExpiration
-            ref={addAdditionalRef}
-            freeText={freeText}
-            storeData={storeData}
-          />
+    <View style={styles.container}>
+      <View style={styles.kitchenContainer}>
+        <View>
+          <Pressable
+            style={styles.freezerContainer}
+            onPress={() =>
+              router.push({
+                pathname: '/(tabs)/locations',
+                params: { location: 'freezer' },
+              })
+            }
+          >
+            <Text>Freezer</Text>
+          </Pressable>
+          <Pressable
+            style={styles.refrigeratorContainer}
+            onPress={() =>
+              router.push({
+                pathname: '/(tabs)/locations',
+                params: { location: 'refrigerator' },
+              })
+            }
+          >
+            <Text>Refrigerator</Text>
+          </Pressable>
         </View>
+        <Pressable
+          style={styles.pantryContainer}
+          onPress={() =>
+            router.push({
+              pathname: '/(tabs)/locations',
+              params: { location: 'pantry' },
+            })
+          }
+        >
+          <Text>Pantry</Text>
+        </Pressable>
       </View>
-    </Pressable>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 24,
+    padding: 40,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  kitchenContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'flex-end',
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  refrigeratorContainer: {
+    height: 300,
+    width: 150,
+    borderWidth: 1,
   },
-  additionIcon: {
-    position: 'absolute',
-    left: 12,
-    bottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 0.5,
+  freezerContainer: {
+    height: 175,
+    width: 150,
+    borderWidth: 1,
+  },
+  pantryContainer: {
+    height: 150,
+    width: 500,
+    borderWidth: 1,
   },
 });
