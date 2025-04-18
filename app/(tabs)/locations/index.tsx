@@ -7,35 +7,68 @@ import {
   View,
 } from 'react-native';
 
-import ItemCard from '../../components/Item';
-import React, { useState, useEffect, useRef } from 'react';
-import { Item } from '@/types/types';
+import ItemCard from '@/components/Item';
+import { useState, useEffect, useRef } from 'react';
+import AddItem from '@/components/AddItem';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { clearStorage } from '@/api/device/storage';
-import AddItem from '@/components/AddItem';
+import React from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { AntDesign } from '@expo/vector-icons';
 import { useStorage } from '@/api/context/storageState';
+import AddExpiration from '@/components/AddExpiration';
+import { useLocalSearchParams } from 'expo-router';
 
-export default function FreezerScreen() {
-  const { storeFreezerList, freeText, setFreeText, freezerList } = useStorage();
+export default function RefrigeratorScreen() {
+  const { location } = useLocalSearchParams();
+  const {
+    setFreeText,
+    freeText,
+    refrigeratorList,
+    storeRefrigeratorList,
+    freezerList,
+    storeFreezerList,
+    pantryList,
+    storePantryList,
+  } = useStorage();
   const [dataRetrieved, setDataRetrieved] = useState<boolean>(false);
 
   const addItemRef = useRef<BottomSheetModal>(null);
+  const addAdditionalRef = useRef<BottomSheetModal>(null);
+
+  const list =
+    location == 'refrigerator'
+      ? refrigeratorList
+      : location == 'freezer'
+      ? freezerList
+      : pantryList;
+
+  const store =
+    location == 'refrigerator'
+      ? storeRefrigeratorList
+      : location == 'freezer'
+      ? storeFreezerList
+      : storePantryList;
+
+  const key =
+    location == 'refrigerator'
+      ? 'refrigerator-key'
+      : location == 'freezer'
+      ? 'freezer-key'
+      : 'pantry-key';
 
   useEffect(() => {
-    if (!freezerList) return;
-    if (freezerList.length === 1 && !dataRetrieved) {
+    if (!list) return;
+    if (list.length === 1 && !dataRetrieved) {
       getData();
       setDataRetrieved(true);
       return;
     }
-  }, [freezerList]);
+    setDataRetrieved(false);
+  }, [list]);
 
-  const storeData = async () => {
-    let lastID =
-      freezerList && freezerList.length > 0 ? freezerList.at(-1).id : 1;
+  const storeData = async (date: Date) => {
+    let lastID = list && list.length > 0 ? list.at(-1).id : 1;
 
     if (!freeText) return;
 
@@ -44,17 +77,16 @@ export default function FreezerScreen() {
       date: new Date().toString(),
       id: lastID + 1,
     };
-    freezerList.push(newListItem);
+    list.push(newListItem);
     setFreeText('');
-
-    storeFreezerList(freezerList, 'add');
+    store(list, 'add');
   };
 
   const getData = async () => {
     try {
-      const jsonValue = await AsyncStorage.getItem('freezer-key');
+      const jsonValue = await AsyncStorage.getItem(key);
       if (jsonValue == null) return;
-      storeFreezerList(JSON.parse(jsonValue), 'add');
+      store(JSON.parse(jsonValue), 'add');
       return jsonValue;
     } catch (e) {
       // error reading value
@@ -62,12 +94,19 @@ export default function FreezerScreen() {
   };
 
   const deleteItem = (index: number) => {
-    const newList = freezerList.toSpliced(index, 1);
-    storeFreezerList(newList, 'delete');
+    const newList = list.toSpliced(index, 1);
+    store(newList, 'delete');
   };
 
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
-    return <ItemCard name={item.name} deleteItem={deleteItem} index={index} />;
+    return (
+      <ItemCard
+        name={item.name}
+        deleteItem={deleteItem}
+        index={index}
+        date={item.date}
+      />
+    );
   };
 
   return (
@@ -80,23 +119,31 @@ export default function FreezerScreen() {
       </Pressable>
       <View>
         <FlatList
-          data={freezerList}
+          data={list}
           keyExtractor={(item, index) => `${item.id}`}
           renderItem={_renderItem}
         />
         <View style={{ height: 100, justifyContent: 'space-around' }}>
-          <Button
+          {/* <Button
             title='clear list'
             onPress={() => {
-              clearStorage('freezer-key');
+              clearStorage('refrigerator-key');
             }}
-          />
+          /> */}
 
           <AddItem
             ref={addItemRef}
-            storeData={storeData}
             freeText={freeText}
             setFreeText={setFreeText}
+            dismiss={() => {
+              addItemRef.current?.dismiss();
+              addAdditionalRef.current?.present();
+            }}
+          />
+          <AddExpiration
+            ref={addAdditionalRef}
+            freeText={freeText}
+            storeData={storeData}
           />
         </View>
       </View>
