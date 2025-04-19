@@ -11,10 +11,9 @@ import {
 import React, { useState } from 'react';
 
 export default function ItemCard(props: any) {
-  const [mode, setMode] = useState('date');
   const web = Platform.OS == 'web';
 
-  const { containerStyle, index, deleteItem, name, date } = props;
+  const { containerStyle, index, deleteItem, name, displayDate } = props;
   const { width } = useWindowDimensions();
 
   return (
@@ -28,7 +27,10 @@ export default function ItemCard(props: any) {
         }}
       >
         <Text>{name}</Text>
-        <Text>Expires:{date}</Text>
+        <Text numberOfLines={1} style={{ width: width / 2 }}>
+          {/* TODO more dynamic i.e determine weeks, months, years from now */}
+          Expires:{displayDate} days from now
+        </Text>
       </View>
       <View style={styles.deleteButton}>
         <Button
@@ -56,7 +58,6 @@ const styles = StyleSheet.create({
   separator: {
     marginVertical: 30,
     height: 1,
-    width: '80%',
   },
   deleteButton: {
     borderRadius: 10,
