@@ -1,4 +1,4 @@
-import { Link, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import React from 'react';
 
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
@@ -9,18 +9,17 @@ import { Pressable } from 'react-native';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-
   return (
     <Stack
       screenOptions={{
-        headerShown: true,
+        headerShown: false,
       }}
     >
       <Stack.Screen
         name='index'
         options={{
           title: 'Location TBD',
-          headerShown: true,
+          headerShown: false,
           headerBackButtonDisplayMode: 'default',
         }}
       />

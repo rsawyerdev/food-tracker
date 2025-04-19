@@ -28,6 +28,7 @@ export default function TabLayout() {
               color='black'
             />
           ),
+          headerShown: true,
         }}
       />
 
