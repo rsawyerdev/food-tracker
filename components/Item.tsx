@@ -55,10 +55,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-  },
+
   deleteButton: {
     borderRadius: 10,
     color: 'red',

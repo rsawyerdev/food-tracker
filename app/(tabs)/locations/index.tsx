@@ -19,8 +19,9 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useStorage } from '@/api/context/storageState';
 import AddExpiration from '@/components/AddExpiration';
 import { router, useLocalSearchParams } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 
-export default function RefrigeratorScreen() {
+export default function Location() {
   const { location } = useLocalSearchParams();
 
   const {
@@ -147,6 +148,7 @@ export default function RefrigeratorScreen() {
           data={list}
           keyExtractor={(item, index) => `${item.id}`}
           renderItem={_renderItem}
+          ListFooterComponent={<View style={{ marginBottom: 60 }} />}
         />
 
         <AddItem
@@ -163,6 +165,22 @@ export default function RefrigeratorScreen() {
           freeText={freeText}
           storeData={storeData}
         />
+        <LinearGradient
+          colors={[
+            'rgba(244, 245, 248, 0)',
+            'rgba(244, 245, 248, 0.7)',
+            'rgba(244, 245, 248, 1)',
+          ]}
+          style={{
+            position: 'absolute',
+            width: '100%',
+            paddingHorizontal: 24,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingTop: 100,
+            bottom: 0,
+          }}
+        />
       </View>
     </Pressable>
   );
@@ -171,7 +189,7 @@ export default function RefrigeratorScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingVertical: 24,
+    paddingTop: 24,
     marginTop: 40,
   },
   backButton: {
