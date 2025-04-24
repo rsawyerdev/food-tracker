@@ -16,7 +16,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useStorage } from '@/api/context/storageState';
+import { useStorage } from '@/app/storage/storageState';
 import AddExpiration from '@/components/AddExpiration';
 import { router, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
