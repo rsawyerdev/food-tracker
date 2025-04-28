@@ -1,13 +1,10 @@
 import { Stack } from 'expo-router';
 import React from 'react';
 
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Pressable } from 'react-native';
+import { Header } from '@/components/Header';
 
-export default function TabLayout() {
+export default function LocationsLayout() {
   const colorScheme = useColorScheme();
   return (
     <Stack
@@ -17,11 +14,12 @@ export default function TabLayout() {
     >
       <Stack.Screen
         name='index'
-        options={{
-          title: 'Location TBD',
-          headerShown: false,
-          headerBackButtonDisplayMode: 'default',
-        }}
+        options={({ route }) => ({
+          headerShown: true,
+          headerTitle: (props: any) => (
+            <Header {...props} title={route?.params.location} />
+          ),
+        })}
       />
     </Stack>
   );

@@ -18,7 +18,7 @@ import React from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useStorage } from '@/app/storage/storageState';
 import AddExpiration from '@/components/AddExpiration';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function Location() {
@@ -42,23 +42,23 @@ export default function Location() {
   const { width } = useWindowDimensions();
 
   const list =
-    location == 'refrigerator'
+    location == 'Refrigerator'
       ? refrigeratorList
-      : location == 'freezer'
+      : location == 'Freezer'
       ? freezerList
       : pantryList;
 
   const store =
-    location == 'refrigerator'
+    location == 'Refrigerator'
       ? storeRefrigeratorList
-      : location == 'freezer'
+      : location == 'Freezer'
       ? storeFreezerList
       : storePantryList;
 
   const key =
-    location == 'refrigerator'
+    location == 'Refrigerator'
       ? 'refrigerator-key'
-      : location == 'freezer'
+      : location == 'Freezer'
       ? 'freezer-key'
       : 'pantry-key';
 
@@ -116,9 +116,6 @@ export default function Location() {
     );
   };
 
-  const upperLocation =
-    String(location).charAt(0).toUpperCase() + String(location).slice(1);
-
   return (
     <Pressable
       onPress={Keyboard.dismiss}
@@ -130,19 +127,7 @@ export default function Location() {
       >
         <AntDesign name='pluscircleo' size={48} color='black' />
       </Pressable>
-      <Pressable
-        onPress={() => router.back()}
-        style={[styles.backButton, { width: width / 2 }]}
-      >
-        <AntDesign name='arrowleft' size={30} color='black' />
-        <Text
-          style={{
-            alignSelf: 'center',
-          }}
-        >
-          {upperLocation}
-        </Text>
-      </Pressable>
+
       <View style={{ flex: 1, width: width }}>
         <FlatList
           data={list}
@@ -192,11 +177,7 @@ const styles = StyleSheet.create({
     paddingTop: 24,
     marginTop: 40,
   },
-  backButton: {
-    paddingLeft: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
+
   title: {
     fontSize: 20,
     fontWeight: 'bold',

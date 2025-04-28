@@ -14,7 +14,7 @@ export default function Kitchen() {
             onPress={() =>
               router.push({
                 pathname: '/(tabs)/locations',
-                params: { location: 'freezer' },
+                params: { location: 'Freezer' },
               })
             }
           >
@@ -26,7 +26,7 @@ export default function Kitchen() {
             onPress={() =>
               router.push({
                 pathname: '/(tabs)/locations',
-                params: { location: 'refrigerator' },
+                params: { location: 'Refrigerator' },
               })
             }
           >
@@ -39,7 +39,7 @@ export default function Kitchen() {
           onPress={() =>
             router.push({
               pathname: '/(tabs)/locations',
-              params: { location: 'pantry' },
+              params: { location: 'Pantry' },
             })
           }
         >
