@@ -1,12 +1,61 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import React from 'react';
+import { Pressable, StyleSheet, View, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import CerealBox from '@/components/CerealBox';
+import { useStorage } from '../storage/storageState';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Kitchen() {
+  const [dataRetrieved, setDataRetrieved] = useState<boolean>(false);
+
+  const {
+    refrigeratorList,
+    storeRefrigeratorList,
+    freezerList,
+    storeFreezerList,
+    pantryList,
+    storePantryList,
+  } = useStorage();
+
+
+  useEffect(() => {
+    if (!refrigeratorList || !freezerList || !pantryList) return;
+
+    if (
+      (refrigeratorList.length === 1 ||
+        freezerList.length === 1 ||
+        pantryList.length === 1) &&
+      !dataRetrieved
+    ) {
+
+      getData();
+      setDataRetrieved(true);
+      return;
+    }
+
+    setDataRetrieved(false);
+  }, []);
+
+  const getData = async () => {
+    try {
+      const jsonRefrigeratorValue = await AsyncStorage.getItem('refrigerator-key');
+      if (jsonRefrigeratorValue == null) return;
+      storeRefrigeratorList(JSON.parse(jsonRefrigeratorValue), 'add');
+      const jsonFreezerValue = await AsyncStorage.getItem('freezer-key');
+      if (jsonFreezerValue == null) return
+      storeFreezerList(JSON.parse(jsonFreezerValue), 'add')
+      const jsonPantryValue = await AsyncStorage.getItem('freezer-key');
+      if (jsonPantryValue == null) return
+      storePantryList(JSON.parse(jsonPantryValue), 'add')
+    } catch (e) {
+      // error reading value
+    }
+  };
+
   return (
     <View style={styles.container}>
+    {!dataRetrieved ? <ActivityIndicator size='large' /> :
       <View style={styles.kitchenContainer}>
         <View>
           <Pressable
@@ -87,6 +136,7 @@ export default function Kitchen() {
           <View style={[styles.pantryShelf, { top: 100 }]} />
         </Pressable>
       </View>
+}
     </View>
   );
 }

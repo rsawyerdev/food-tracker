@@ -9,11 +9,10 @@ import {
 } from 'react-native';
 
 import ItemCard from '@/components/Item';
-import { useState, useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import AddItem from '@/components/AddItem';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useStorage } from '@/app/storage/storageState';
@@ -34,7 +33,6 @@ export default function Location() {
     pantryList,
     storePantryList,
   } = useStorage();
-  const [dataRetrieved, setDataRetrieved] = useState<boolean>(false);
 
   const addItemRef = useRef<BottomSheetModal>(null);
   const addAdditionalRef = useRef<BottomSheetModal>(null);
@@ -55,23 +53,6 @@ export default function Location() {
       ? storeFreezerList
       : storePantryList;
 
-  const key =
-    location == 'Refrigerator'
-      ? 'refrigerator-key'
-      : location == 'Freezer'
-      ? 'freezer-key'
-      : 'pantry-key';
-
-  useEffect(() => {
-    if (!list) return;
-    if (list.length === 1 && !dataRetrieved) {
-      getData();
-      setDataRetrieved(true);
-      return;
-    }
-    setDataRetrieved(false);
-  }, [list]);
-
   const storeData = async (date: Date) => {
     let lastID = list && list.length > 0 ? list.at(-1).id : 1;
 
@@ -87,16 +68,6 @@ export default function Location() {
     store(list, 'add');
   };
 
-  const getData = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem(key);
-      if (jsonValue == null) return;
-      store(JSON.parse(jsonValue), 'add');
-      return jsonValue;
-    } catch (e) {
-      // error reading value
-    }
-  };
 
   const deleteItem = (index: number) => {
     const newList = list.toSpliced(index, 1);
