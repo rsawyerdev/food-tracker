@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import CerealBox from '@/components/CerealBox';
-import { useStorage } from '../storage/storageState';
+import { useStorage } from '../../storage/storageState';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Kitchen() {

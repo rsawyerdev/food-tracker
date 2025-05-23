@@ -15,7 +15,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 
 import React from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useStorage } from '@/app/storage/storageState';
+import { useStorage } from '@/storage/storageState';
 import AddExpiration from '@/components/AddExpiration';
 import { useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
