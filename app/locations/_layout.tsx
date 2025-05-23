@@ -14,7 +14,8 @@ export default function LocationsLayout() {
     >
       <Stack.Screen
         name='index'
-        options={({ route }) => ({
+        options={({ route }: {route: any
+        }) => ({
           headerShown: true,
           headerTitle: (props: any) => (
             <Header {...props} title={route?.params.location} />

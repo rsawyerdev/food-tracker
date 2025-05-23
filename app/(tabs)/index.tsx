@@ -86,7 +86,7 @@ export default function Kitchen() {
             style={styles.freezerContainer}
             onPress={() =>
               router.push({
-                pathname: '/(tabs)/locations',
+                pathname: '/locations',
                 params: { location: 'Freezer' },
               })
             }
@@ -99,7 +99,7 @@ export default function Kitchen() {
             style={styles.refrigeratorContainer}
             onPress={() =>
               router.push({
-                pathname: '/(tabs)/locations',
+                pathname: '/locations',
                 params: { location: 'Refrigerator' },
               })
             }
@@ -113,7 +113,7 @@ export default function Kitchen() {
           style={styles.pantryContainer}
           onPress={() =>
             router.push({
-              pathname: '/(tabs)/locations',
+              pathname: '/locations',
               params: { location: 'Pantry' },
             })
           }

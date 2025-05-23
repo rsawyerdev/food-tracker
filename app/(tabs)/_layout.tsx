@@ -46,12 +46,7 @@ export default function TabLayout() {
           tabBarLabelStyle: { fontFamily: 'Nunito_400Regular', fontSize: 12 },
         }}
       />
-      <Tabs.Screen
-        name='locations'
-        options={{
-          href: null,
-        }}
-      />
+ 
     </Tabs>
   );
 }
