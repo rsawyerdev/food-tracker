@@ -19,9 +19,13 @@ import { useStorage } from '@/storage/storageState';
 import AddExpiration from '@/components/AddExpiration';
 import { useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import uuid from 'react-native-uuid';
+
 
 export default function Location() {
   const { location } = useLocalSearchParams();
+
+  const newID = uuid.v4()
 
   const {
     setFreeText,
@@ -54,14 +58,13 @@ export default function Location() {
       : storePantryList;
 
   const storeData = async (date: Date) => {
-    let lastID = list && list.length > 0 ? list.at(-1).id : 1;
 
     if (!freeText) return;
 
     const newListItem = {
       name: freeText,
       date: date.toString(),
-      id: lastID + 1,
+      id: newID,
     };
     list.push(newListItem);
     setFreeText('');
