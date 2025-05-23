@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, View, ActivityIndicator } from 'react-native';
+import { Pressable, StyleSheet, View, ActivityIndicator, Text } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
@@ -37,6 +37,30 @@ export default function Kitchen() {
     setDataRetrieved(false);
   }, []);
 
+  let numRefrigertorExpired= 0 ;
+    refrigeratorList.find((expired) => {
+      if (new Date(expired.date).getDate() < new Date().getDate()) {
+        numRefrigertorExpired++
+
+      }
+    }
+  );
+
+    let numFreezerExpired = 0;
+    freezerList.find((expired) => {
+      if (new Date(expired.date).getDate() < new Date().getDate()) {
+        numFreezerExpired++;
+      }
+    });
+
+    let numPantryExpired = 0;
+    pantryList.find((expired) => {
+      if (new Date(expired.date).getDate() < new Date().getDate()) {
+        numPantryExpired++;
+      }
+    });
+
+
   const getData = async () => {
     try {
       const jsonRefrigeratorValue = await AsyncStorage.getItem('refrigerator-key');
@@ -69,6 +93,7 @@ export default function Kitchen() {
           >
             <FontAwesome6 name='snowflake' size={68} color='darkblue' />
             <View style={styles.freezerHandle} />
+            {numFreezerExpired ?<Text style={styles.expiredText}>{numFreezerExpired} Expired items</Text> : <></>}
           </Pressable>
           <Pressable
             style={styles.refrigeratorContainer}
@@ -81,6 +106,7 @@ export default function Kitchen() {
           >
             <FontAwesome6 name='snowflake' size={68} color='lightblue' />
             <View style={styles.refrigeratorHandle} />
+           {numRefrigertorExpired? <Text style={styles.expiredText}>{numRefrigertorExpired} Expired items</Text>: <></>}
           </Pressable>
         </View>
         <Pressable
@@ -134,6 +160,8 @@ export default function Kitchen() {
             <FontAwesome6 name='apple-whole' size={32} color='#c70404' />
           </View>
           <View style={[styles.pantryShelf, { top: 100 }]} />
+          {numPantryExpired?<Text style={styles.expiredText}>{numPantryExpired} Expired items</Text>: <></>}
+
         </Pressable>
       </View>
 }
@@ -209,4 +237,10 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'space-evenly',
   },
+  expiredText: {
+    position: 'absolute',
+    bottom: 12,
+    fontFamily: 'Nunito_900Black',
+    color: 'red'
+  }
 });
