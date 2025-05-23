@@ -1,11 +1,9 @@
-import { Link, Tabs } from 'expo-router';
+import { Tabs } from 'expo-router';
 import React from 'react';
 
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Pressable } from 'react-native';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -20,7 +18,6 @@ export default function TabLayout() {
       <Tabs.Screen
         name='index'
         options={{
-          title: 'Kitchen',
           tabBarIcon: () => (
             <MaterialCommunityIcons
               name='fridge-bottom'
@@ -28,7 +25,14 @@ export default function TabLayout() {
               color='black'
             />
           ),
+          tabBarLabelStyle: { fontFamily: 'Nunito_400Regular', fontSize: 12 },
           headerShown: true,
+          title: 'Kitchen',
+
+          headerTitleStyle: {
+            fontSize: 24,
+            fontFamily: 'Nunito_900Black',
+          },
         }}
       />
 
@@ -39,6 +43,7 @@ export default function TabLayout() {
           tabBarIcon: () => (
             <FontAwesome name='list-alt' size={24} color='black' />
           ),
+          tabBarLabelStyle: { fontFamily: 'Nunito_400Regular', fontSize: 12 },
         }}
       />
       <Tabs.Screen

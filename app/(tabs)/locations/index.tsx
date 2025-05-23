@@ -9,16 +9,15 @@ import {
 } from 'react-native';
 
 import ItemCard from '@/components/Item';
-import { useState, useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import AddItem from '@/components/AddItem';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useStorage } from '@/api/context/storageState';
+import { useStorage } from '@/storage/storageState';
 import AddExpiration from '@/components/AddExpiration';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function Location() {
@@ -34,7 +33,6 @@ export default function Location() {
     pantryList,
     storePantryList,
   } = useStorage();
-  const [dataRetrieved, setDataRetrieved] = useState<boolean>(false);
 
   const addItemRef = useRef<BottomSheetModal>(null);
   const addAdditionalRef = useRef<BottomSheetModal>(null);
@@ -42,35 +40,18 @@ export default function Location() {
   const { width } = useWindowDimensions();
 
   const list =
-    location == 'refrigerator'
+    location == 'Refrigerator'
       ? refrigeratorList
-      : location == 'freezer'
+      : location == 'Freezer'
       ? freezerList
       : pantryList;
 
   const store =
-    location == 'refrigerator'
+    location == 'Refrigerator'
       ? storeRefrigeratorList
-      : location == 'freezer'
+      : location == 'Freezer'
       ? storeFreezerList
       : storePantryList;
-
-  const key =
-    location == 'refrigerator'
-      ? 'refrigerator-key'
-      : location == 'freezer'
-      ? 'freezer-key'
-      : 'pantry-key';
-
-  useEffect(() => {
-    if (!list) return;
-    if (list.length === 1 && !dataRetrieved) {
-      getData();
-      setDataRetrieved(true);
-      return;
-    }
-    setDataRetrieved(false);
-  }, [list]);
 
   const storeData = async (date: Date) => {
     let lastID = list && list.length > 0 ? list.at(-1).id : 1;
@@ -87,16 +68,6 @@ export default function Location() {
     store(list, 'add');
   };
 
-  const getData = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem(key);
-      if (jsonValue == null) return;
-      store(JSON.parse(jsonValue), 'add');
-      return jsonValue;
-    } catch (e) {
-      // error reading value
-    }
-  };
 
   const deleteItem = (index: number) => {
     const newList = list.toSpliced(index, 1);
@@ -116,9 +87,6 @@ export default function Location() {
     );
   };
 
-  const upperLocation =
-    String(location).charAt(0).toUpperCase() + String(location).slice(1);
-
   return (
     <Pressable
       onPress={Keyboard.dismiss}
@@ -130,19 +98,7 @@ export default function Location() {
       >
         <AntDesign name='pluscircleo' size={48} color='black' />
       </Pressable>
-      <Pressable
-        onPress={() => router.back()}
-        style={[styles.backButton, { width: width / 2 }]}
-      >
-        <AntDesign name='arrowleft' size={30} color='black' />
-        <Text
-          style={{
-            alignSelf: 'center',
-          }}
-        >
-          {upperLocation}
-        </Text>
-      </Pressable>
+
       <View style={{ flex: 1, width: width }}>
         <FlatList
           data={list}
@@ -192,11 +148,7 @@ const styles = StyleSheet.create({
     paddingTop: 24,
     marginTop: 40,
   },
-  backButton: {
-    paddingLeft: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
+
   title: {
     fontSize: 20,
     fontWeight: 'bold',
