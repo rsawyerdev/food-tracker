@@ -1,26 +1,28 @@
 import {
-  Button,
+  Text,
   FlatList,
   Keyboard,
   Pressable,
   StyleSheet,
   View,
+  useWindowDimensions,
 } from 'react-native';
 
 import ItemCard from '@/components/Item';
-import { useState, useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import AddItem from '@/components/AddItem';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useStorage } from '@/api/context/storageState';
+import { useStorage } from '@/storage/storageState';
 import AddExpiration from '@/components/AddExpiration';
 import { useLocalSearchParams } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 
-export default function RefrigeratorScreen() {
+export default function Location() {
   const { location } = useLocalSearchParams();
+
   const {
     setFreeText,
     freeText,
@@ -31,41 +33,25 @@ export default function RefrigeratorScreen() {
     pantryList,
     storePantryList,
   } = useStorage();
-  const [dataRetrieved, setDataRetrieved] = useState<boolean>(false);
 
   const addItemRef = useRef<BottomSheetModal>(null);
   const addAdditionalRef = useRef<BottomSheetModal>(null);
 
+  const { width } = useWindowDimensions();
+
   const list =
-    location == 'refrigerator'
+    location == 'Refrigerator'
       ? refrigeratorList
-      : location == 'freezer'
+      : location == 'Freezer'
       ? freezerList
       : pantryList;
 
   const store =
-    location == 'refrigerator'
+    location == 'Refrigerator'
       ? storeRefrigeratorList
-      : location == 'freezer'
+      : location == 'Freezer'
       ? storeFreezerList
       : storePantryList;
-
-  const key =
-    location == 'refrigerator'
-      ? 'refrigerator-key'
-      : location == 'freezer'
-      ? 'freezer-key'
-      : 'pantry-key';
-
-  useEffect(() => {
-    if (!list) return;
-    if (list.length === 1 && !dataRetrieved) {
-      getData();
-      setDataRetrieved(true);
-      return;
-    }
-    setDataRetrieved(false);
-  }, [list]);
 
   const storeData = async (date: Date) => {
     let lastID = list && list.length > 0 ? list.at(-1).id : 1;
@@ -74,23 +60,12 @@ export default function RefrigeratorScreen() {
 
     const newListItem = {
       name: freeText,
-      date: new Date().toString(),
+      date: date.toString(),
       id: lastID + 1,
     };
     list.push(newListItem);
     setFreeText('');
     store(list, 'add');
-  };
-
-  const getData = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem(key);
-      if (jsonValue == null) return;
-      store(JSON.parse(jsonValue), 'add');
-      return jsonValue;
-    } catch (e) {
-      // error reading value
-    }
   };
 
   const deleteItem = (index: number) => {
@@ -99,53 +74,68 @@ export default function RefrigeratorScreen() {
   };
 
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
+    const timeFromNow = new Date(item.date).getDate() - new Date().getDate();
     return (
       <ItemCard
         name={item.name}
         deleteItem={deleteItem}
         index={index}
         date={item.date}
+        displayDate={timeFromNow}
       />
     );
   };
 
   return (
-    <Pressable onPress={Keyboard.dismiss} style={styles.container}>
+    <Pressable
+      onPress={Keyboard.dismiss}
+      style={[styles.container, { width: width }]}
+    >
       <Pressable
         style={[styles.additionIcon]}
         onPress={() => addItemRef.current?.present()}
       >
         <AntDesign name='pluscircleo' size={48} color='black' />
       </Pressable>
-      <View>
+
+      <View style={{ flex: 1, width: width }}>
         <FlatList
           data={list}
           keyExtractor={(item, index) => `${item.id}`}
           renderItem={_renderItem}
+          ListFooterComponent={<View style={{ marginBottom: 60 }} />}
         />
-        <View style={{ height: 100, justifyContent: 'space-around' }}>
-          {/* <Button
-            title='clear list'
-            onPress={() => {
-              clearStorage('refrigerator-key');
-            }}
-          /> */}
 
-          <AddItem
-            ref={addItemRef}
-            freeText={freeText}
-            setFreeText={setFreeText}
-            dismiss={() => {
-              addItemRef.current?.dismiss();
-              addAdditionalRef.current?.present();
-            }}
-          />
-          <AddExpiration
-            ref={addAdditionalRef}
-            freeText={freeText}
-            storeData={storeData}
-          />
-        </View>
+        <AddItem
+          ref={addItemRef}
+          freeText={freeText}
+          setFreeText={setFreeText}
+          dismiss={() => {
+            addItemRef.current?.dismiss();
+            addAdditionalRef.current?.present();
+          }}
+        />
+        <AddExpiration
+          ref={addAdditionalRef}
+          freeText={freeText}
+          storeData={storeData}
+        />
+        <LinearGradient
+          colors={[
+            'rgba(244, 245, 248, 0)',
+            'rgba(244, 245, 248, 0.7)',
+            'rgba(244, 245, 248, 1)',
+          ]}
+          style={{
+            position: 'absolute',
+            width: '100%',
+            paddingHorizontal: 24,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingTop: 100,
+            bottom: 0,
+          }}
+        />
       </View>
     </Pressable>
   );
@@ -154,10 +144,10 @@ export default function RefrigeratorScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 24,
+    paddingTop: 24,
+    marginTop: 40,
   },
+
   title: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -175,5 +165,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.5,
     shadowRadius: 0.5,
+    zIndex: 1,
   },
 });

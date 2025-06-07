@@ -3,7 +3,14 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
+// import { useFonts,  } from 'expo-font';
+import {
+  useFonts,
+  Nunito_900Black,
+  Nunito_300Light,
+  Nunito_400Regular,
+} from '@expo-google-fonts/nunito';
+
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
@@ -20,7 +27,9 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    bold: Nunito_900Black,
+    Nunito_300Light,
+    regular: Nunito_400Regular,
   });
 
   useEffect(() => {

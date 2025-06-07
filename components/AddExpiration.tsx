@@ -52,7 +52,7 @@ export default React.forwardRef(function (props, ref) {
         }}
       >
         <View style={styles.textContainer}>
-          <Text>When does the {freeText} expire?</Text>
+          <Text style={styles.text}>When does the {freeText} expire?</Text>
           <DateTimePicker
             testID='dateTimePicker'
             value={date}
@@ -84,5 +84,8 @@ const styles = StyleSheet.create({
   itemText: {
     paddingVertical: 5,
     fontSize: 18,
+  },
+  text: {
+    fontFamily: 'regular',
   },
 });

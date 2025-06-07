@@ -82,14 +82,14 @@ export default function Recipes() {
           data={remainingIngredients}
           renderItem={(ingredient) => (
             <Pressable onPress={() => findItems(allItems, ingredient.item)}>
-              <Text>{ingredient.item}</Text>
+              <Text style={styles.text}>{ingredient.item}</Text>
             </Pressable>
           )}
           ListFooterComponent={
             <View style={{ marginTop: 20 }}>
               {RecipeList.map((recipe) => (
                 <Pressable onPress={() => findItems(allItems, recipe.title)}>
-                  <Text>{recipe.title}</Text>
+                  <Text style={styles.text}>{recipe.title}</Text>
                 </Pressable>
               ))}
             </View>
@@ -109,7 +109,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   recipeTitle: {
-    fontWeight: 'bold',
+    fontFamily: 'bold',
     marginBottom: 12,
   },
+  text: { fontFamily: 'regular' },
 });
