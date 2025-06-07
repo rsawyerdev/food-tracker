@@ -68,7 +68,6 @@ export default function Location() {
     store(list, 'add');
   };
 
-
   const deleteItem = (index: number) => {
     const newList = list.toSpliced(index, 1);
     store(newList, 'delete');

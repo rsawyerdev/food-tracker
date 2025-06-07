@@ -17,7 +17,6 @@ type Actions = {
   reset: () => void;
   setFreeText: (text: string) => void;
   storePantryList: (newList: Item[], action: string) => void;
-  storeCounterList: (newList: Item[], action: string) => void;
   storeFreezerList: (newList: Item[], action: string) => void;
   storeRefrigeratorList: (newList: Item[], action: string) => void;
 };
@@ -51,24 +50,6 @@ export const useStorage = create<StorageState & Actions>()((set, get) => ({
         action === 'delete' ? newList : newPantryList
       );
       await AsyncStorage.setItem('pantry-key', jsonValue);
-    } catch (e) {
-      // saving error
-    }
-  },
-  storeCounterList: async (newList: Item[], action: string) => {
-    let newCounterList;
-    newCounterList = set({ counterList: get().counterList });
-    if (newCounterList == undefined) {
-      newCounterList = newList;
-    } else {
-      newCounterList = newCounterList;
-    }
-    set({ counterList: newCounterList });
-    try {
-      const jsonValue = JSON.stringify(
-        action === 'delete' ? newList : newCounterList
-      );
-      await AsyncStorage.setItem('counter-key', jsonValue);
     } catch (e) {
       // saving error
     }

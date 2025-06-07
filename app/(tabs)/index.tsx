@@ -1,4 +1,10 @@
-import { Pressable, StyleSheet, View, ActivityIndicator, Text } from 'react-native';
+import {
+  Pressable,
+  StyleSheet,
+  View,
+  ActivityIndicator,
+  Text,
+} from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
@@ -18,7 +24,6 @@ export default function Kitchen() {
     storePantryList,
   } = useStorage();
 
-
   useEffect(() => {
     if (!refrigeratorList || !freezerList || !pantryList) return;
 
@@ -28,7 +33,6 @@ export default function Kitchen() {
         pantryList.length === 1) &&
       !dataRetrieved
     ) {
-
       getData();
       setDataRetrieved(true);
       return;
@@ -37,41 +41,40 @@ export default function Kitchen() {
     setDataRetrieved(false);
   }, []);
 
-  let numRefrigertorExpired= 0 ;
-    refrigeratorList.find((expired) => {
-      if (new Date(expired.date).getDate() < new Date().getDate()) {
-        numRefrigertorExpired++
-
-      }
+  let numRefrigertorExpired = 0;
+  refrigeratorList.find((expired) => {
+    if (new Date(expired.date).getDate() < new Date().getDate()) {
+      numRefrigertorExpired++;
     }
-  );
+  });
 
-    let numFreezerExpired = 0;
-    freezerList.find((expired) => {
-      if (new Date(expired.date).getDate() < new Date().getDate()) {
-        numFreezerExpired++;
-      }
-    });
+  let numFreezerExpired = 0;
+  freezerList.find((expired) => {
+    if (new Date(expired.date).getDate() < new Date().getDate()) {
+      numFreezerExpired++;
+    }
+  });
 
-    let numPantryExpired = 0;
-    pantryList.find((expired) => {
-      if (new Date(expired.date).getDate() < new Date().getDate()) {
-        numPantryExpired++;
-      }
-    });
-
+  let numPantryExpired = 0;
+  pantryList.find((expired) => {
+    if (new Date(expired.date).getDate() < new Date().getDate()) {
+      numPantryExpired++;
+    }
+  });
 
   const getData = async () => {
     try {
-      const jsonRefrigeratorValue = await AsyncStorage.getItem('refrigerator-key');
+      const jsonRefrigeratorValue = await AsyncStorage.getItem(
+        'refrigerator-key'
+      );
       if (jsonRefrigeratorValue == null) return;
       storeRefrigeratorList(JSON.parse(jsonRefrigeratorValue), 'add');
       const jsonFreezerValue = await AsyncStorage.getItem('freezer-key');
-      if (jsonFreezerValue == null) return
-      storeFreezerList(JSON.parse(jsonFreezerValue), 'add')
-      const jsonPantryValue = await AsyncStorage.getItem('freezer-key');
-      if (jsonPantryValue == null) return
-      storePantryList(JSON.parse(jsonPantryValue), 'add')
+      if (jsonFreezerValue == null) return;
+      storeFreezerList(JSON.parse(jsonFreezerValue), 'add');
+      const jsonPantryValue = await AsyncStorage.getItem('pantry-key');
+      if (jsonPantryValue == null) return;
+      storePantryList(JSON.parse(jsonPantryValue), 'add');
     } catch (e) {
       // error reading value
     }
@@ -79,92 +82,111 @@ export default function Kitchen() {
 
   return (
     <View style={styles.container}>
-    {!dataRetrieved ? <ActivityIndicator size='large' /> :
-      <View style={styles.kitchenContainer}>
-        <View>
+      {!dataRetrieved ? (
+        <ActivityIndicator size='large' />
+      ) : (
+        <View style={styles.kitchenContainer}>
+          <View>
+            <Pressable
+              style={styles.freezerContainer}
+              onPress={() =>
+                router.push({
+                  pathname: '/(tabs)/locations',
+                  params: { location: 'Freezer' },
+                })
+              }
+            >
+              <FontAwesome6 name='snowflake' size={68} color='darkblue' />
+              <View style={styles.freezerHandle} />
+              {numFreezerExpired ? (
+                <Text style={styles.expiredText}>
+                  {numFreezerExpired} Expired items
+                </Text>
+              ) : (
+                <></>
+              )}
+            </Pressable>
+            <Pressable
+              style={styles.refrigeratorContainer}
+              onPress={() =>
+                router.push({
+                  pathname: '/(tabs)/locations',
+                  params: { location: 'Refrigerator' },
+                })
+              }
+            >
+              <FontAwesome6 name='snowflake' size={68} color='lightblue' />
+              <View style={styles.refrigeratorHandle} />
+              {numRefrigertorExpired ? (
+                <Text style={styles.expiredText}>
+                  {numRefrigertorExpired} Expired items
+                </Text>
+              ) : (
+                <></>
+              )}
+            </Pressable>
+          </View>
           <Pressable
-            style={styles.freezerContainer}
+            style={styles.pantryContainer}
             onPress={() =>
               router.push({
                 pathname: '/(tabs)/locations',
-                params: { location: 'Freezer' },
+                params: { location: 'Pantry' },
               })
             }
           >
-            <FontAwesome6 name='snowflake' size={68} color='darkblue' />
-            <View style={styles.freezerHandle} />
-            {numFreezerExpired ?<Text style={styles.expiredText}>{numFreezerExpired} Expired items</Text> : <></>}
-          </Pressable>
-          <Pressable
-            style={styles.refrigeratorContainer}
-            onPress={() =>
-              router.push({
-                pathname: '/(tabs)/locations',
-                params: { location: 'Refrigerator' },
-              })
-            }
-          >
-            <FontAwesome6 name='snowflake' size={68} color='lightblue' />
-            <View style={styles.refrigeratorHandle} />
-           {numRefrigertorExpired? <Text style={styles.expiredText}>{numRefrigertorExpired} Expired items</Text>: <></>}
+            <View style={styles.cerealContainer}>
+              <CerealBox
+                borderColor='#317506'
+                backgroundColor='#3e9407'
+                textColor='#122b01'
+              />
+              <CerealBox
+                textColor='#e3aade'
+                borderColor='#5e0056'
+                backgroundColor='#852a7d'
+              />
+              <CerealBox
+                textColor='#023557'
+                backgroundColor='#1396ed'
+                borderColor='#013152'
+              />
+              <CerealBox
+                borderColor='#521d01'
+                backgroundColor='#943604'
+                textColor='#c96d3c'
+              />
+              <CerealBox
+                borderColor='#3d2234'
+                backgroundColor='#8c4f78'
+                textColor='#ff91db'
+              />
+            </View>
+            <View style={[styles.pantryShelf, { top: 60 }]} />
+            <View
+              style={{
+                flexDirection: 'row',
+                top: 100,
+                width: '100%',
+                justifyContent: 'space-evenly',
+                paddingHorizontal: 12,
+              }}
+            >
+              <FontAwesome6 name='bread-slice' size={32} color='tan' />
+              <FontAwesome6 name='bowl-rice' size={32} color='#fff' />
+              <FontAwesome6 name='apple-whole' size={32} color='#c70404' />
+            </View>
+            <View style={[styles.pantryShelf, { top: 100 }]} />
+            {numPantryExpired ? (
+              <Text style={styles.expiredText}>
+                {numPantryExpired} Expired items
+              </Text>
+            ) : (
+              <></>
+            )}
           </Pressable>
         </View>
-        <Pressable
-          style={styles.pantryContainer}
-          onPress={() =>
-            router.push({
-              pathname: '/(tabs)/locations',
-              params: { location: 'Pantry' },
-            })
-          }
-        >
-          <View style={styles.cerealContainer}>
-            <CerealBox
-              borderColor='#317506'
-              backgroundColor='#3e9407'
-              textColor='#122b01'
-            />
-            <CerealBox
-              textColor='#e3aade'
-              borderColor='#5e0056'
-              backgroundColor='#852a7d'
-            />
-            <CerealBox
-              textColor='#023557'
-              backgroundColor='#1396ed'
-              borderColor='#013152'
-            />
-            <CerealBox
-              borderColor='#521d01'
-              backgroundColor='#943604'
-              textColor='#c96d3c'
-            />
-            <CerealBox
-              borderColor='#3d2234'
-              backgroundColor='#8c4f78'
-              textColor='#ff91db'
-            />
-          </View>
-          <View style={[styles.pantryShelf, { top: 60 }]} />
-          <View
-            style={{
-              flexDirection: 'row',
-              top: 100,
-              width: '100%',
-              justifyContent: 'space-evenly',
-              paddingHorizontal: 12,
-            }}
-          >
-            <FontAwesome6 name='bread-slice' size={32} color='tan' />
-            <FontAwesome6 name='bowl-rice' size={32} color='#fff' />
-            <FontAwesome6 name='apple-whole' size={32} color='#c70404' />
-          </View>
-          <View style={[styles.pantryShelf, { top: 100 }]} />
-          {numPantryExpired?<Text style={styles.expiredText}>{numPantryExpired} Expired items</Text>: <></>}
-
-        </Pressable>
-      </View>
-}
+      )}
     </View>
   );
 }
@@ -241,6 +263,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 12,
     fontFamily: 'Nunito_900Black',
-    color: 'red'
-  }
+    color: 'red',
+  },
 });
