@@ -27,9 +27,9 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
-    Nunito_900Black,
+    bold: Nunito_900Black,
     Nunito_300Light,
-    Nunito_400Regular,
+    regular: Nunito_400Regular,
   });
 
   useEffect(() => {

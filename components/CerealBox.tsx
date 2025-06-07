@@ -36,5 +36,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
     alignItems: 'center',
   },
-  cerealText: { fontSize: 6, width: 5, textAlign: 'center' },
+  cerealText: {
+    fontSize: 6,
+    width: 5,
+    textAlign: 'center',
+    fontFamily: 'regular',
+  },
 });

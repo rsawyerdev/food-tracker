@@ -57,8 +57,8 @@ export default function ItemCard(props: any) {
             borderRadius: 10,
           }}
         >
-          <Text>{name}</Text>
-          <Text numberOfLines={1} style={{ width: width / 1.5 }}>
+          <Text style={styles.text}>{name}</Text>
+          <Text numberOfLines={1} style={[styles.text, { width: width / 1.5 }]}>
             {/* TODO more dynamic i.e determine weeks, months, years from now */}
             Expires:{displayDate} days from now
           </Text>
@@ -94,4 +94,5 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
   },
   button: { padding: 10 },
+  text: { fontFamily: 'regular' },
 });
