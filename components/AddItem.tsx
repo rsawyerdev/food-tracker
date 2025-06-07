@@ -105,6 +105,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingLeft: 8,
     backgroundColor: 'lightblue',
+    fontFamily: 'regular',
   },
   textContainer: {
     flexDirection: 'row',
@@ -113,5 +114,6 @@ const styles = StyleSheet.create({
   itemText: {
     paddingVertical: 5,
     fontSize: 18,
+    fontFamily: 'regular',
   },
 });

@@ -25,13 +25,13 @@ export default function TabLayout() {
               color='black'
             />
           ),
-          tabBarLabelStyle: { fontFamily: 'Nunito_400Regular', fontSize: 12 },
+          tabBarLabelStyle: { fontFamily: 'regular', fontSize: 12 },
           headerShown: true,
           title: 'Kitchen',
 
           headerTitleStyle: {
             fontSize: 24,
-            fontFamily: 'Nunito_900Black',
+            fontFamily: 'bold',
           },
         }}
       />
@@ -43,7 +43,7 @@ export default function TabLayout() {
           tabBarIcon: () => (
             <FontAwesome name='list-alt' size={24} color='black' />
           ),
-          tabBarLabelStyle: { fontFamily: 'Nunito_400Regular', fontSize: 12 },
+          tabBarLabelStyle: { fontFamily: 'regular', fontSize: 12 },
         }}
       />
       <Tabs.Screen

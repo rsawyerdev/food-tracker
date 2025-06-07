@@ -21,7 +21,7 @@ export function Header(props: any) {
         style={{
           fontSize: 24,
           textAlign: 'center',
-          fontFamily: 'Nunito_900Black',
+          fontFamily: 'bold',
         }}
       >
         {props.title}

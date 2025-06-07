@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   expiredText: {
     position: 'absolute',
     bottom: 12,
-    fontFamily: 'Nunito_900Black',
+    fontFamily: 'bold',
     color: 'red',
   },
 });
