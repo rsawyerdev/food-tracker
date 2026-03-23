@@ -28,9 +28,9 @@ export default function Kitchen() {
     if (!refrigeratorList || !freezerList || !pantryList) return;
 
     if (
-      (refrigeratorList.length === 1 ||
-        freezerList.length === 1 ||
-        pantryList.length === 1) &&
+      (refrigeratorList.length === 0 ||
+        freezerList.length === 0 ||
+        pantryList.length === 0) &&
       !dataRetrieved
     ) {
       getData();
@@ -42,21 +42,21 @@ export default function Kitchen() {
   }, []);
 
   let numRefrigertorExpired = 0;
-  refrigeratorList.find((expired) => {
+ refrigeratorList && refrigeratorList.find((expired) => {
     if (new Date(expired.date).getDate() < new Date().getDate()) {
       numRefrigertorExpired++;
     }
   });
 
   let numFreezerExpired = 0;
-  freezerList.find((expired) => {
+  freezerList && freezerList.find((expired) => {
     if (new Date(expired.date).getDate() < new Date().getDate()) {
       numFreezerExpired++;
     }
   });
 
   let numPantryExpired = 0;
-  pantryList.find((expired) => {
+  pantryList && pantryList.find((expired) => {
     if (new Date(expired.date).getDate() < new Date().getDate()) {
       numPantryExpired++;
     }

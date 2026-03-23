@@ -8,8 +8,14 @@ import React, { useCallback, useState } from 'react';
 import { StyleSheet, View, Text, Button } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-export default React.forwardRef(function (props, ref) {
-  const { storeData, freeText, setFreeText } = props;
+interface AddExpirationProps {
+  storeData: (data: Date) => void;
+  freeText: string;
+  ref: any
+}
+
+export default function (props: AddExpirationProps)  {
+  const { storeData, freeText, ref } = props;
   const [date, setDate] = useState(new Date(Date.now()));
 
   const onChange = (event: any, selectedDate: any) => {
@@ -65,7 +71,7 @@ export default React.forwardRef(function (props, ref) {
       </BottomSheetView>
     </BottomSheetModal>
   );
-});
+};
 
 const styles = StyleSheet.create({
   container: {},

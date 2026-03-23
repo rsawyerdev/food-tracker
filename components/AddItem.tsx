@@ -5,14 +5,22 @@ import {
   BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Button, FlatList, StyleSheet, View, Text } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
 
-export default React.forwardRef(function (props, ref) {
-  const { freeText, setFreeText, dismiss } = props;
+
+interface AddItemProps {
+  freeText: string;
+  setFreeText: (text: string) => void;
+  dismiss: () => void
+  ref: any
+}
+
+export default function (props: AddItemProps) {
+  const { freeText, setFreeText, dismiss, ref } = props;
   const [loading, setLoading] = useState(false);
-  const [suggestionsList, setSuggestionsList] = useState(null);
+  const [suggestionsList, setSuggestionsList] = useState([{title:"", id:  0 }]);
 
   const renderBackdrop = useCallback(
     (props: any) => (
@@ -29,24 +37,29 @@ export default React.forwardRef(function (props, ref) {
 
   const handleSnap = [300];
 
-  const getSuggestions = useCallback(async (q) => {
+  const getSuggestions = useCallback(async (q: string) => {
     const filterToken = q.toLowerCase();
     setFreeText(filterToken);
 
     if (typeof q !== 'string' || q.length < 1) {
-      setSuggestionsList(null);
+      setSuggestionsList([]);
       return;
     }
     setLoading(true);
     const suggestionList = suggestions
       .filter((item) => item.title.toLowerCase().includes(filterToken))
       .map((item) => ({
-        id: item.id,
+        id: Number(item.id),
         title: item.title,
       }));
     setSuggestionsList(suggestionList);
     setLoading(false);
   }, []);
+
+  const handleOnChangeText = () => {
+    setFreeText(freeText);
+    getSuggestions(freeText)
+  }
 
   return (
     <BottomSheetModal
@@ -67,7 +80,7 @@ export default React.forwardRef(function (props, ref) {
             style={[styles.textInput]}
             placeholder={freeText}
             value={freeText}
-            onChangeText={setFreeText && getSuggestions}
+            onChangeText={handleOnChangeText}
             enablesReturnKeyAutomatically
             // onSubmitEditing={() => setFreeText('')}
             clearTextOnFocus
@@ -83,10 +96,10 @@ export default React.forwardRef(function (props, ref) {
         </View>
         <FlatList
           data={suggestionsList}
-          renderItem={(suggestion) => (
+          renderItem={({item}) => (
             <View>
-              <Pressable onPress={() => setFreeText(suggestion.item.title)}>
-                <Text style={[styles.itemText]}>{suggestion.item.title}</Text>
+              <Pressable onPress={() => setFreeText(item.title)}>
+                <Text style={[styles.itemText]}>{item.title}</Text>
               </Pressable>
             </View>
           )}
@@ -94,7 +107,7 @@ export default React.forwardRef(function (props, ref) {
       </BottomSheetView>
     </BottomSheetModal>
   );
-});
+};
 
 const styles = StyleSheet.create({
   container: {},

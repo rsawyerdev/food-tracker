@@ -54,7 +54,7 @@ export default function Location() {
       : storePantryList;
 
   const storeData = async (date: Date) => {
-    let lastID = list && list.length > 0 ? list.at(-1).id : 1;
+    let lastID = list && list.length > 0 ? list[-1].id : 1;
 
     if (!freeText) return;
 
