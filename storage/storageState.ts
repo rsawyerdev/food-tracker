@@ -23,10 +23,10 @@ type Actions = {
 
 // define the initial state
 const initialState: StorageState = {
-  pantryList: [firstItem],
-  counterList: [firstItem],
-  refrigeratorList: [firstItem],
-  freezerList: [firstItem],
+  pantryList: [],
+  counterList: [],
+  refrigeratorList: [],
+  freezerList: [],
   key: '',
   freeText: '',
 };
