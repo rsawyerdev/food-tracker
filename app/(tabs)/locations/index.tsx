@@ -108,8 +108,6 @@ export default function Location() {
 
         <AddItem
           ref={addItemRef}
-          freeText={freeText}
-          setFreeText={setFreeText}
           dismiss={() => {
             addItemRef.current?.dismiss();
             addAdditionalRef.current?.present();

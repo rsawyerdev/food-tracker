@@ -1,4 +1,5 @@
 import { suggestions } from '@/constants/Utils';
+import { useStorage } from '@/storage/storageState';
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
@@ -11,16 +12,18 @@ import { Pressable } from 'react-native-gesture-handler';
 
 
 interface AddItemProps {
-  freeText: string;
-  setFreeText: (text: string) => void;
   dismiss: () => void
   ref: any
 }
 
 export default function (props: AddItemProps) {
-  const { freeText, setFreeText, dismiss, ref } = props;
+  const { dismiss, ref } = props;
   const [loading, setLoading] = useState(false);
   const [suggestionsList, setSuggestionsList] = useState([{title:"", id:  0 }]);
+    const {
+      setFreeText,
+      freeText,
+    } = useStorage();
 
   const renderBackdrop = useCallback(
     (props: any) => (
@@ -34,8 +37,6 @@ export default function (props: AddItemProps) {
     ),
     []
   );
-
-  const handleSnap = [300];
 
   const getSuggestions = useCallback(async (q: string) => {
     const filterToken = q.toLowerCase();
@@ -56,15 +57,14 @@ export default function (props: AddItemProps) {
     setLoading(false);
   }, []);
 
-  const handleOnChangeText = () => {
-    setFreeText(freeText);
-    getSuggestions(freeText)
+  function handleOnChangeText(text: string){
+    setFreeText(text)
+    getSuggestions(text)
   }
 
   return (
     <BottomSheetModal
       ref={ref}
-      snapPoints={handleSnap}
       backdropComponent={renderBackdrop}
     >
       <BottomSheetView
@@ -78,11 +78,9 @@ export default function (props: AddItemProps) {
         <View style={styles.textContainer}>
           <BottomSheetTextInput
             style={[styles.textInput]}
-            placeholder={freeText}
             value={freeText}
             onChangeText={handleOnChangeText}
             enablesReturnKeyAutomatically
-            // onSubmitEditing={() => setFreeText('')}
             clearTextOnFocus
           />
           <View>
