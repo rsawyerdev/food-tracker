@@ -6,12 +6,14 @@ import {
   StyleSheet,
   View,
   useWindowDimensions,
+  Button,
 } from 'react-native';
 
 import ItemCard from '@/components/Item';
 import { useRef } from 'react';
 import AddItem from '@/components/AddItem';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import uuid from 'react-native-uuid';
 
 import React from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
@@ -32,6 +34,7 @@ export default function Location() {
     storeFreezerList,
     pantryList,
     storePantryList,
+    reset
   } = useStorage();
 
   const addItemRef = useRef<BottomSheetModal>(null);
@@ -54,14 +57,11 @@ export default function Location() {
       : storePantryList;
 
   const storeData = async (date: Date) => {
-    let lastID = list && list.length > 0 ? list[-1].id : 1;
-
-    if (!freeText) return;
-
+   
     const newListItem = {
       name: freeText,
       date: date.toString(),
-      id: lastID + 1,
+      id: uuid.v4(),
     };
     list.push(newListItem);
     setFreeText('');
@@ -135,6 +135,7 @@ export default function Location() {
           }}
         />
       </View>
+      <Button onPress={()=> reset()} title='reset'/>
     </Pressable>
   );
 }
