@@ -21,6 +21,7 @@ import { useStorage } from '@/storage/storageState';
 import AddExpiration from '@/components/AddExpiration';
 import { useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { ItemMovement, Locations } from '@/types/enums';
 
 export default function Location() {
   const { location } = useLocalSearchParams();
@@ -43,21 +44,21 @@ export default function Location() {
   const { width } = useWindowDimensions();
 
   const list =
-    location == 'Refrigerator'
+    location === Locations.refrigerator
       ? refrigeratorList
-      : location == 'Freezer'
-      ? freezerList
-      : pantryList;
+      : location === Locations.freezer
+        ? freezerList
+        : pantryList;
 
   const store =
-    location == 'Refrigerator'
+    location === Locations.refrigerator
       ? storeRefrigeratorList
-      : location == 'Freezer'
-      ? storeFreezerList
-      : storePantryList;
+      : location === Locations.freezer
+        ? storeFreezerList
+        : storePantryList;
 
   const storeData = async (date: Date) => {
-   
+
     const newListItem = {
       name: freeText,
       date: date.toString(),
@@ -65,12 +66,12 @@ export default function Location() {
     };
     list.push(newListItem);
     setFreeText('');
-    store(list, 'add');
+    store(list, ItemMovement.add);
   };
 
   const deleteItem = (index: number) => {
     const newList = list.toSpliced(index, 1);
-    store(newList, 'delete');
+    store(newList, ItemMovement.delete);
   };
 
   const _renderItem = ({ item, index }: { item: any; index: number }) => {
@@ -135,7 +136,7 @@ export default function Location() {
           }}
         />
       </View>
-      <Button onPress={()=> reset()} title='reset'/>
+      <Button onPress={() => reset()} title='reset' />
     </Pressable>
   );
 }
