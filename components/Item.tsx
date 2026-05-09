@@ -14,10 +14,18 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import { isExpired } from '@/hooks/isExpired';
 
 export default function ItemCard(props: any) {
-  const { index, deleteItem, name, displayDate } = props;
+  dayjs.extend(relativeTime)
+
+  const { index, deleteItem, name, date } = props;
   const { width } = useWindowDimensions();
+  const displayDate = `Expires ${dayjs(date).fromNow()}`
+  const expired = isExpired(date)
+  const displayText = expired ? 'Expired' : `${displayDate}`
 
   const rightAction = (
     prog: SharedValue<number>,
@@ -59,8 +67,7 @@ export default function ItemCard(props: any) {
         >
           <Text style={styles.text}>{name}</Text>
           <Text numberOfLines={1} style={[styles.text, { width: width / 1.5 }]}>
-            {/* TODO more dynamic i.e determine weeks, months, years from now */}
-            Expires:{displayDate} days from now
+             {displayText}
           </Text>
         </View>
       </ReanimatedSwipeable>

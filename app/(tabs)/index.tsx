@@ -11,6 +11,7 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import CerealBox from '@/components/CerealBox';
 import { useStorage } from '../../storage/storageState';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { isExpired } from '@/hooks/isExpired';
 
 export default function Kitchen() {
   const [dataRetrieved, setDataRetrieved] = useState<boolean>(false);
@@ -50,14 +51,14 @@ export default function Kitchen() {
 
   let numFreezerExpired = 0;
   freezerList && freezerList.find((expired) => {
-    if (new Date(expired.date).getDate() < new Date().getDate()) {
+    if (isExpired(new Date(expired.date))) {
       numFreezerExpired++;
     }
   });
 
   let numPantryExpired = 0;
   pantryList && pantryList.find((expired) => {
-    if (new Date(expired.date).getDate() < new Date().getDate()) {
+    if (isExpired(new Date(expired.date))) {
       numPantryExpired++;
     }
   });

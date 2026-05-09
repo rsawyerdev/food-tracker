@@ -82,7 +82,6 @@ export default function Location() {
         deleteItem={deleteItem}
         index={index}
         date={item.date}
-        displayDate={timeFromNow}
       />
     );
   };
