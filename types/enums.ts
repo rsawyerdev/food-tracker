@@ -4,7 +4,7 @@ export enum ItemMovement {
 }
 
 export enum Locations {
-    refrigerator = 'Regrigerator',
+    refrigerator = 'Refrigerator',
     freezer = 'Freezer',
     pantry = 'Pantry'
 }
