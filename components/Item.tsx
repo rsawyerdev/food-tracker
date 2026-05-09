@@ -16,7 +16,7 @@ import { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { isExpired } from '@/hooks/isExpired';
+import { isExpired } from '@/constants/Utils';
 
 export default function ItemCard(props: any) {
   dayjs.extend(relativeTime)

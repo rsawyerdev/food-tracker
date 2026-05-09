@@ -11,7 +11,7 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import CerealBox from '@/components/CerealBox';
 import { useStorage } from '../../storage/storageState';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { isExpired } from '@/hooks/isExpired';
+import { isExpired } from '@/constants/Utils';
 
 export default function Kitchen() {
   const [dataRetrieved, setDataRetrieved] = useState<boolean>(false);
