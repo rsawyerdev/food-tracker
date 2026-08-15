@@ -1,5 +1,5 @@
+import React, { useRef } from 'react';
 import {
-  Text,
   FlatList,
   Keyboard,
   Pressable,
@@ -7,18 +7,17 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
-
-import ItemCard from '@/components/Item';
-import { useRef } from 'react';
-import AddItem from '@/components/AddItem';
-import AntDesign from '@expo/vector-icons/AntDesign';
-
-import React from 'react';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useStorage } from '@/storage/storageState';
-import AddExpiration from '@/components/AddExpiration';
 import { useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Crypto from 'expo-crypto';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import AntDesign from '@expo/vector-icons/AntDesign';
+
+import ItemCard from '@/components/Item';
+import AddItem from '@/components/AddItem';
+import { useStorage } from '@/storage/storageState';
+import AddExpiration from '@/components/AddExpiration';
+
 
 export default function Location() {
   const { location } = useLocalSearchParams();
@@ -36,6 +35,7 @@ export default function Location() {
 
   const addItemRef = useRef<BottomSheetModal>(null);
   const addAdditionalRef = useRef<BottomSheetModal>(null);
+  const UUID = Crypto.randomUUID();
 
   const { width } = useWindowDimensions();
 
@@ -43,25 +43,24 @@ export default function Location() {
     location == 'Refrigerator'
       ? refrigeratorList
       : location == 'Freezer'
-      ? freezerList
-      : pantryList;
+        ? freezerList
+        : pantryList;
 
   const store =
     location == 'Refrigerator'
       ? storeRefrigeratorList
       : location == 'Freezer'
-      ? storeFreezerList
-      : storePantryList;
+        ? storeFreezerList
+        : storePantryList;
 
   const storeData = async (date: Date) => {
-    let lastID = list && list.length > 0 ? list.at(-1).id : 1;
 
     if (!freeText) return;
 
     const newListItem = {
       name: freeText,
       date: date.toString(),
-      id: lastID + 1,
+      id: UUID,
     };
     list.push(newListItem);
     setFreeText('');
