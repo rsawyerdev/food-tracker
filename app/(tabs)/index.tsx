@@ -28,9 +28,9 @@ export default function Kitchen() {
     if (!refrigeratorList || !freezerList || !pantryList) return;
 
     if (
-      (refrigeratorList.length === 1 ||
-        freezerList.length === 1 ||
-        pantryList.length === 1) &&
+      (refrigeratorList.length === 0 ||
+        freezerList.length === 0 ||
+        pantryList.length === 0) &&
       !dataRetrieved
     ) {
       getData();

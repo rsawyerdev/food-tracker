@@ -1,5 +1,3 @@
-export const firstItem = { name: 'test', date: new Date().toString(), id: 1 };
-
 export const suggestions = [
   { title: 'salt', id: '1' },
   { title: 'pepper', id: '2' },
