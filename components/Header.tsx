@@ -4,7 +4,13 @@ import React from 'react';
 import { AntDesign } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, useWindowDimensions } from 'react-native';
 
-export function Header(props: any) {
+export interface HeaderProps {
+  children: string,
+  tintColor: string,
+  title: string
+}
+
+export function Header(props: HeaderProps) {
   const { width } = useWindowDimensions();
   return (
     <Pressable
@@ -12,7 +18,7 @@ export function Header(props: any) {
       style={[styles.headerContainer, { width: width }]}
     >
       <AntDesign
-        name='arrowleft'
+        name='arrow-left'
         size={30}
         color='black'
         style={styles.backIcon}

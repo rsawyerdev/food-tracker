@@ -94,7 +94,7 @@ export default function Location() {
         style={[styles.additionIcon]}
         onPress={() => addItemRef.current?.present()}
       >
-        <AntDesign name='pluscircleo' size={48} color='black' />
+        <AntDesign name='plus-circle' size={48} color='black' />
       </Pressable>
 
       <View style={{ flex: 1, width: width }}>
