@@ -1,4 +1,3 @@
-import { firstItem } from '@/constants/Utils';
 import { Item } from '@/types/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
@@ -23,10 +22,10 @@ type Actions = {
 
 // define the initial state
 const initialState: StorageState = {
-  pantryList: [firstItem],
-  counterList: [firstItem],
-  refrigeratorList: [firstItem],
-  freezerList: [firstItem],
+  pantryList: [],
+  counterList: [],
+  refrigeratorList: [],
+  freezerList: [],
   key: '',
   freeText: '',
 };
@@ -47,7 +46,7 @@ export const useStorage = create<StorageState & Actions>()((set, get) => ({
     set({ pantryList: newPantryList });
     try {
       const jsonValue = JSON.stringify(
-        action === 'delete' ? newList : newPantryList
+        action === 'delete' ? newList : newPantryList,
       );
       await AsyncStorage.setItem('pantry-key', jsonValue);
     } catch (e) {
@@ -65,7 +64,7 @@ export const useStorage = create<StorageState & Actions>()((set, get) => ({
     set({ freezerList: newFreezerList });
     try {
       const jsonValue = JSON.stringify(
-        action === 'delete' ? newList : newFreezerList
+        action === 'delete' ? newList : newFreezerList,
       );
       await AsyncStorage.setItem('freezer-key', jsonValue);
     } catch (e) {
@@ -83,7 +82,7 @@ export const useStorage = create<StorageState & Actions>()((set, get) => ({
     set({ refrigeratorList: newRefrigeratorList });
     try {
       const jsonValue = JSON.stringify(
-        action === 'delete' ? newList : newRefrigeratorList
+        action === 'delete' ? newList : newRefrigeratorList,
       );
       await AsyncStorage.setItem('refrigerator-key', jsonValue);
     } catch (e) {

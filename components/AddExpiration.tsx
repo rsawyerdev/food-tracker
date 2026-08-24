@@ -8,8 +8,13 @@ import React, { useCallback, useState } from 'react';
 import { StyleSheet, View, Text, Button } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-export default React.forwardRef(function (props, ref) {
-  const { storeData, freeText, setFreeText } = props;
+interface AddExpirationProps {
+  storeData: (data: Date) => void;
+  freeText: string;
+}
+
+export default React.forwardRef(function (props: AddExpirationProps, ref: any) {
+  const { storeData, freeText } = props;
   const [date, setDate] = useState(new Date(Date.now()));
 
   const onChange = (event: any, selectedDate: any) => {
