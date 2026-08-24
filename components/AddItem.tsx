@@ -36,7 +36,7 @@ export default React.forwardRef(function (props: AddItemProps, ref: any) {
 
   const handleSnap = [300];
 
-  const getSuggestions = useCallback(async (q) => {
+  const getSuggestions = useCallback(async (q: string) => {
     const filterToken = q.toLowerCase();
     setFreeText(filterToken);
 
