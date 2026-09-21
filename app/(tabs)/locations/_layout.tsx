@@ -17,7 +17,7 @@ export default function LocationsLayout() {
         options={({ route }) => ({
           headerShown: true,
           headerTitle: (props: any) => (
-            <Header {...props} title={route?.params.location} />
+            <Header {...props} title={route?.params?.location} />
           ),
         })}
       />
